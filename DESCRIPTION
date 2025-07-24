@@ -1,0 +1,15 @@
+Package: rAMAMEV
+Title: Multi-Variate Measurement Error Adjustment
+Version: 0.0.0.9000
+Authors@R: 
+    person("Alexander", "Lee", , "alex1.lee@wur.nl", role = c("aut", "cre"))
+Description: What the package does (one paragraph).
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+Imports: 
+    MASS

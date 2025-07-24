@@ -1,0 +1,13 @@
+# Base R ignores
+.Rproj.user
+.Rhistory
+.Rdata
+.httr-oauth
+.DS_Store
+.quarto
+
+# Project specific
+base_r_script.R
+
+# General
+.vscode/
