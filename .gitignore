@@ -11,3 +11,6 @@ base_r_script.R
 
 # General
 .vscode/
+
+# Extra
+extra/

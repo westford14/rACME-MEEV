@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(rAMAMEV)
+library(rACMEMEEV)
 
-test_check("rAMAMEV")
+test_check("rACMEMEEV")
