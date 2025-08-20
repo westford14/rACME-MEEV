@@ -37,16 +37,12 @@ jobs:
         run: roxygen2::roxygenise()
         shell: Rscript {0}
 
-      - name: commit
+      - name: Check for changes
+        id: check_changes
         run: |
-          git config --local user.name "$GITHUB_ACTOR"
-          git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
-          git add man/\* NAMESPACE
-          git commit -m 'Document'
-
-      - uses: r-lib/actions/pr-push@v2
-        with:
-          repo-token: ${{ secrets.TOKEN_GITHUB }}
+          if [[ -n $(git status --porcelain) ]]; then
+              echo "changes=true" >> "$GITHUB_OUTPUT"; 
+          fi
 
   style:
     if: ${{ github.event.issue.pull_request && (github.event.comment.author_association == 'MEMBER' || github.event.comment.author_association == 'OWNER') && startsWith(github.event.comment.body, '/style') }}
@@ -73,13 +69,9 @@ jobs:
         run: styler::style_pkg()
         shell: Rscript {0}
 
-      - name: commit
+      - name: Check for changes
+        id: check_changes
         run: |
-          git config --local user.name "$GITHUB_ACTOR"
-          git config --local user.email "$GITHUB_ACTOR@users.noreply.github.com"
-          git add \*.R
-          git commit -m 'Style'
-
-      - uses: r-lib/actions/pr-push@v2
-        with:
-          repo-token: ${{ secrets.TOKEN_GITHUB }}
+          if [[ -n $(git status --porcelain) ]]; then
+              echo "changes=true" >> "$GITHUB_OUTPUT"; 
+          fi

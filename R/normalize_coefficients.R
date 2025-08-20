@@ -20,11 +20,10 @@
 #' ci <- 0.95
 #' normalize_coefficients(n, coef_lower, coef_upper, ci)
 normalize_coefficients <- function(
-  n,
-  lower_bound,
-  upper_bound,
-  interval = 0.95
-) {
+    n,
+    lower_bound,
+    upper_bound,
+    interval = 0.95) {
   stopifnot(lower_bound < upper_bound)
   stopifnot(interval > 0 && interval < 1)
   stopifnot(lower_bound > 0 && lower_bound < 1)
