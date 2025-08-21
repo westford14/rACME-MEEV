@@ -4,7 +4,7 @@
 \alias{generate_coefficient}
 \title{Generate updated validity coefficient using Fisher Z Transformation}
 \usage{
-generate_coefficient(n, lower_bound, upper_bound, interval = 0.95)
+generate_coefficient(n, lower_bound, upper_bound, interval = 0.95, seed = 42)
 }
 \arguments{
 \item{n}{the samples for the normal distribution}
@@ -14,6 +14,8 @@ generate_coefficient(n, lower_bound, upper_bound, interval = 0.95)
 \item{upper_bound}{numeric the upper boudnary of the validity coefficient}
 
 \item{interval}{numeric the confidence interval to use (default 0.95)}
+
+\item{seed}{numeric the random seed to use}
 }
 \value{
 Validity coefficient

@@ -13,7 +13,7 @@ create_model_string <- function() {
   model_string <- "
   model {
     for (i in 1:n) {
-      zx[i, 1:p] ~ dmnorm( zMu[1:p] , zInvCovMat[1:p, 1:p] )
+      model_data[i, 1:p] ~ dmnorm( zMu[1:p] , zInvCovMat[1:p, 1:p] )
     }
 
     for (varIdx in 1:p) {
@@ -36,8 +36,8 @@ create_model_string <- function() {
     }
 
     for (varIdx in 1:p) {
-      sigma[varIdx] <- zSigma[varIdx] * sdOrig[varIdx]
-      mu[varIdx] <- zMu[varIdx] * sdOrig[varIdx] + meanOrig[varIdx]
+      sigma[varIdx] <- zSigma[varIdx] * sd_orig[, varIdx]
+      mu[varIdx] <- zMu[varIdx] * sd_orig[, varIdx] + mean_orig[, varIdx]
     }
     for (varIdx1 in 1:p) {
       for (varIdx2 in 1:p) {
