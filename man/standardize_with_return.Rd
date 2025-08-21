@@ -19,7 +19,3 @@ type object. Standardization in this case refers
 to (x - mean(x)) / sd(x) where X is a 1-dimensional
 vector.
 }
-\examples{
-data <- c(1, 2, 3, 4)
-standardize_with_return(data)
-}

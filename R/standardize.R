@@ -8,11 +8,6 @@
 #' @param data vector The vector to standardize
 #' @return List with the original standard deviation, mean,
 #'         and the standardized data
-#' @export
-#'
-#' @examples
-#' data <- c(1, 2, 3, 4)
-#' standardize_with_return(data)
 standardize_with_return <- function(data) {
   stopifnot((is.vector(data) & !is.list(data)))
   stopifnot((is.vector(data) & length(data) > 1))

@@ -24,7 +24,3 @@ Errors will be thrown if the data is not a class,
 or inherit from, a data.frame or if the specified
 columns do not exist in the data.frame.
 }
-\examples{
-data <- data.frame(list("fruit" = c(1, 2), "veg" = c(3, 4)))
-create_modelling_data(data, names(data))
-}

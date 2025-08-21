@@ -12,11 +12,6 @@
 #' @param columns vector The columns to target
 #' @return List with all the appropriate things needed
 #'         for modelling with JAGS
-#' @export
-#'
-#' @examples
-#' data <- data.frame(list("fruit" = c(1, 2), "veg" = c(3, 4)))
-#' create_modelling_data(data, names(data))
 create_modelling_data <- function(data, columns) {
   stopifnot(is.data.frame(data))
   stopifnot(all(columns %in% names(data)))
@@ -34,7 +29,7 @@ create_modelling_data <- function(data, columns) {
 
   model_data <- data.frame(std_data_full)
   list(
-    data = model_data,
+    model_data = model_data,
     n = nrow(model_data),
     p = ncol(model_data),
     sd_orig = data.frame(sds),

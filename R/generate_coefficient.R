@@ -11,6 +11,7 @@
 #' @param lower_bound numeric the lower boundary of the validity coefficient
 #' @param upper_bound numeric the upper boudnary of the validity coefficient
 #' @param interval numeric the confidence interval to use (default 0.95)
+#' @param seed numeric the random seed to use
 #' @return Validity coefficient
 #' @export
 #'
@@ -24,14 +25,23 @@ generate_coefficient <- function(
     n,
     lower_bound,
     upper_bound,
-    interval = 0.95) {
+    interval = 0.95,
+    seed = 42) {
   stopifnot(lower_bound < upper_bound)
   stopifnot(interval > 0 && interval < 1)
   stopifnot(lower_bound > 0 && lower_bound < 1)
   stopifnot(upper_bound > 0 && upper_bound < 1)
   stopifnot(n > 0)
+  stopifnot(is.numeric(seed))
 
-  normal_dist <- normalize_coefficients(n, lower_bound, upper_bound, interval)
+  set.seed(seed)
+
+  normal_dist <- normalize_coefficients(
+    n,
+    lower_bound,
+    upper_bound,
+    interval
+  )
   rho <- (exp(2 * mean(normal_dist)) - 1) / (exp(2 * mean(normal_dist)) + 1)
   rho
 }

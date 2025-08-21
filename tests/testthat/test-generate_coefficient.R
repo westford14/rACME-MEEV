@@ -38,11 +38,11 @@ test_that("test that generating the coefficient works`1", {
   set.seed(1234)
   reps <- c()
   for (i in 1:1000) {
-    reps <- append(reps, generate_coefficient(10000, 0.3, 0.8, 0.95))
+    reps <- append(reps, generate_coefficient(10000, 0.3, 0.8, 0.95, 1234))
   }
   expect_equal(
     mean(reps),
-    0.607,
+    0.6077,
     tolerance = 1e-3
   )
 })

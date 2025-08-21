@@ -12,7 +12,7 @@ test_that("error is when columns don't match", {
 
 test_that("expected response", {
   expected <- list(
-    data = data.frame(
+    model_data = data.frame(
       x = c(-1.1618950, -0.3872983, 0.3872983, 1.1618950),
       y = c(-1.1618950, -0.3872983, 0.3872983, 1.1618950)
     ),
