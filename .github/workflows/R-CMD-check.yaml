@@ -35,7 +35,7 @@ jobs:
       - name: install jags
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
-            apt-get update -y && apt-get install jags -y
+            sudo apt-get update -y && sudo apt-get install jags -y
           # elif [ "$RUNNER_OS" == "Windows" ]; then
           #   choco install important_windows_software
           else
