@@ -35,14 +35,13 @@ jobs:
       - name: install jags
         run: |
           if [ "$RUNNER_OS" == "Linux" ]; then
-            apt-get update --y && apt-get install jags
+            apt-get update -y && apt-get install jags -y
           # elif [ "$RUNNER_OS" == "Windows" ]; then
           #   choco install important_windows_software
           else
             /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
             brew install pkg-config
             brew install jags
-            brew link —overwrite jags
           fi
         shell: bash
 
