@@ -26,7 +26,6 @@
 acme_model <- function(
     data,
     columns,
-    model,
     n_chains = 1,
     n_adapt_steps = 500,
     n_burn = 1000,
