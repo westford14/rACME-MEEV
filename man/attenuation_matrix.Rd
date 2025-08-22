@@ -14,7 +14,8 @@ attenuation_matrix(model_output, columns, validity_coefficients)
 \item{validity_coefficients}{vector Vector of the validity coefficients}
 }
 \value{
-attenuation-contamination matrix
+List with the attenuation-contamination matrix and the standard
+deviations
 }
 \description{
 From the output JAGS model, create the needed attenuation
