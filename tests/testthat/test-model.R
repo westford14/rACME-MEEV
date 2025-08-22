@@ -34,3 +34,10 @@ test_that("error is when columns don't match", {
   )
   expect_error(acme_model(df, c("x", "y", "z")))
 })
+
+test_that("acme modelling works", {
+  df <- data.frame(
+    list(x = c(1, 2, 3, 4), y = c(2, 3, 4, 5))
+  )
+  acme_model(df, names(df))
+})

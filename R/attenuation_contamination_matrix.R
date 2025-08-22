@@ -6,7 +6,8 @@
 #' @param model_output list List of the mcmc summary and covariance matrix
 #' @param columns vector Vector of the column names that are being assessed
 #' @param validity_coefficients vector Vector of the validity coefficients
-#' @return attenuation-contamination matrix
+#' @return List with the attenuation-contamination matrix and the standard
+#'              deviations
 #' @import gdata
 #' @export
 attenuation_matrix <- function(model_output, columns, validity_coefficients) {
@@ -93,5 +94,9 @@ attenuation_matrix <- function(model_output, columns, validity_coefficients) {
   q_mat[upper.tri(q_mat)] <- unlist(covariances, use.names = FALSE)
 
   lambda <- t_mat %*% solve(q_mat)
-  lambda
+  list(
+    matrix = lambda,
+    sds = sds,
+    variances = variances
+  )
 }

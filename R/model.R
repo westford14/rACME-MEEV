@@ -72,6 +72,7 @@ acme_model <- function(
   scovmat <- summary(mcmc_samples)
   list(
     covariance_matrix = scovmat,
-    samples = mcmc_samples
+    samples = mcmc_samples,
+    model = jags_model
   )
 }
