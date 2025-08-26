@@ -6,22 +6,36 @@
 #' @param model_output list List of the mcmc summary and covariance matrix
 #' @param columns vector Vector of the column names that are being assessed
 #' @param validity_coefficients vector Vector of the validity coefficients
+#' @param stan boolean If you are passing in a Stan backend pre-model
 #' @return List with the attenuation-contamination matrix and the standard
 #'              deviations
-#' @import gdata
 #' @export
-attenuation_matrix <- function(model_output, columns, validity_coefficients) {
+#' @import utils
+attenuation_matrix <- function(
+    model_output,
+    columns,
+    validity_coefficients,
+    stan = FALSE) {
   stopifnot(is.list(model_output))
   stopifnot(length(columns) == length(validity_coefficients))
 
-  cov_matrix <- model_output$covariance_matrix$statistics
-  combinations <- combn(seq_along(columns), 2)
+  if (stan) {
+    cov_matrix <- model_output$covariance_matrix$summary
+  } else {
+    cov_matrix <- model_output$covariance_matrix$statistics
+  }
+
+  combinations <- utils::combn(seq_along(columns), 2)
 
   sds <- list()
   counter <- 1
   for (row in rownames(cov_matrix)) {
     if (grepl("sigma", row, fixed = TRUE)) {
-      sds[[columns[counter]]] <- cov_matrix[row, "Mean"]
+      if (stan) {
+        sds[[columns[counter]]] <- cov_matrix[row, "mean"]
+      } else {
+        sds[[columns[counter]]] <- cov_matrix[row, "Mean"]
+      }
       counter <- counter + 1
     }
   }
@@ -40,7 +54,11 @@ attenuation_matrix <- function(model_output, columns, validity_coefficients) {
       second,
       "]"
     )
-    rho <- cov_matrix[col_name, "Mean"]
+    if (stan) {
+      rho <- cov_matrix[col_name, "mean"]
+    } else {
+      rho <- cov_matrix[col_name, "Mean"]
+    }
     correlations[[columns[column]]] <- rho
 
     name <- paste0("cov-", columns[first], "-", columns[second])
@@ -75,7 +93,7 @@ attenuation_matrix <- function(model_output, columns, validity_coefficients) {
     data = NA,
     nrow = length(columns),
     ncol = length(columns),
-    dim = list(columns, columns)
+    dimnames = list(columns, columns)
   )
   diag(t_mat) <- unlist(variances, use.names = FALSE)
   t_mat[upper.tri(t_mat)] <- unlist(covariances_between, use.names = FALSE)
@@ -86,7 +104,7 @@ attenuation_matrix <- function(model_output, columns, validity_coefficients) {
     data = NA,
     nrow = length(columns),
     ncol = length(columns),
-    dim = list(columns, columns)
+    dimnames = list(columns, columns)
   )
   diag(q_mat) <- unlist(sds, use.names = FALSE)^2
   q_mat[upper.tri(q_mat)] <- unlist(covariances, use.names = FALSE)

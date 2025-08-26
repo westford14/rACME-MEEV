@@ -4,7 +4,7 @@
 \alias{attenuation_matrix}
 \title{Create Attenuation Contamination Matrix}
 \usage{
-attenuation_matrix(model_output, columns, validity_coefficients)
+attenuation_matrix(model_output, columns, validity_coefficients, stan = FALSE)
 }
 \arguments{
 \item{model_output}{list List of the mcmc summary and covariance matrix}
@@ -12,6 +12,8 @@ attenuation_matrix(model_output, columns, validity_coefficients)
 \item{columns}{vector Vector of the column names that are being assessed}
 
 \item{validity_coefficients}{vector Vector of the validity coefficients}
+
+\item{stan}{boolean If you are passing in a Stan backend pre-model}
 }
 \value{
 List with the attenuation-contamination matrix and the standard

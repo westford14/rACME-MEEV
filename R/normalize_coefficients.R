@@ -12,6 +12,7 @@
 #' @param interval numeric the confidence interval to use (default 0.95)
 #' @return Normal distribution
 #' @export
+#' @import stats
 #'
 #' @examples
 #' n <- 1000
@@ -30,10 +31,10 @@ normalize_coefficients <- function(
   stopifnot(upper_bound > 0 && upper_bound < 1)
   stopifnot(n > 0)
 
-  cv <- qnorm((1 - interval) / 2, lower.tail = FALSE)
+  cv <- stats::qnorm((1 - interval) / 2, lower.tail = FALSE)
   z_lower <- fisher_z_transform(lower_bound)
   z_upper <- fisher_z_transform(upper_bound)
   mu <- 0.5 * (z_lower + z_upper)
   sd <- (0.5 * (z_upper - z_lower)) / cv
-  rnorm(n, mu, sd)
+  stats::rnorm(n, mu, sd)
 }

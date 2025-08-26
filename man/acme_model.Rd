@@ -12,7 +12,8 @@ acme_model(
   n_burn = 1000,
   n_thin = 1,
   n_steps = 10000,
-  seed = 42
+  seed = 42,
+  stan = FALSE
 )
 }
 \arguments{
@@ -31,6 +32,8 @@ acme_model(
 \item{n_steps}{numeric The total number of draws to run, default = 10,000}
 
 \item{seed}{numeric The random seed to set}
+
+\item{stan}{boolean If you would like to use the experimental Stan backend}
 }
 \value{
 List with all the appropriate things needed

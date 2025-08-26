@@ -5,6 +5,7 @@
 .httr-oauth
 .DS_Store
 .quarto
+Rplots.pdf
 
 # Project specific
 base_r_script.R
@@ -14,3 +15,4 @@ base_r_script.R
 
 # Extra
 extra/
+outputs/

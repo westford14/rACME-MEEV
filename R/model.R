@@ -15,10 +15,13 @@
 #' @param n_thin numeric Thinning factor for the draws, default = 1
 #' @param n_steps numeric The total number of draws to run, default = 10,000
 #' @param seed numeric The random seed to set
+#' @param stan boolean If you would like to use the experimental Stan backend
 #' @return List with all the appropriate things needed
 #'         for modelling with JAGS
 #' @export
 #' @import rjags
+#' @import rstan
+#' @import stats
 #'
 #' @examples
 #' data <- data.frame(list("fruit" = c(1, 2), "veg" = c(3, 4)))
@@ -31,7 +34,8 @@ acme_model <- function(
     n_burn = 1000,
     n_thin = 1,
     n_steps = 10000,
-    seed = 42) {
+    seed = 42,
+    stan = FALSE) {
   # Check if the correct type
   stopifnot(is.numeric(n_chains))
   stopifnot(is.numeric(n_adapt_steps))
@@ -51,28 +55,55 @@ acme_model <- function(
 
   set.seed(seed)
 
-  modelling_data <- create_modelling_data(data, columns)
-  model_path <- create_model_string()
+  if (stan) {
+    modelling_data <- create_modelling_data(data, columns)
+    modelling_data$sd_orig <- as.numeric(modelling_data$sd_orig[1, ])
+    modelling_data$mean_orig <- as.numeric(modelling_data$mean_orig[1, ])
+    model_path <- create_stan_model_string()
 
-  jags_model <- jags.model(
-    model_path,
-    modelling_data,
-    n.chains = n_chains,
-    n.adapt = n_adapt_steps
-  )
+    stan_pre_model <- rstan::stan_model(model_path)
 
-  update(jags_model, n.iter = n_burn)
-  mcmc_samples <- coda.samples(
-    jags_model,
-    variable.names = c("sigma", "rho"),
-    n.iter = n_steps / n_chains * n_thin,
-    thin = n_thin,
-    seed = seed
-  )
-  scovmat <- summary(mcmc_samples)
-  list(
-    covariance_matrix = scovmat,
-    samples = mcmc_samples,
-    model = jags_model
-  )
+    mcmc_samples <- rstan::sampling(
+      stan_pre_model,
+      modelling_data,
+      pars = c("sigma", "rho"),
+      chains = n_chains,
+      iter = n_steps,
+      thin = n_thin,
+      seed = seed,
+      warmup = n_adapt_steps + n_burn
+    )
+
+    scovmat <- summary(mcmc_samples)
+    return(list(
+      covariance_matrix = scovmat,
+      samples = mcmc_samples,
+      model = stan_pre_model
+    ))
+  } else {
+    modelling_data <- create_modelling_data(data, columns)
+    model_path <- create_model_string()
+
+    jags_model <- rjags::jags.model(
+      model_path,
+      modelling_data,
+      n.chains = n_chains,
+      n.adapt = n_adapt_steps
+    )
+
+    stats::update(jags_model, n.iter = n_burn)
+    mcmc_samples <- rjags::coda.samples(
+      jags_model,
+      variable.names = c("sigma", "rho"),
+      n.iter = n_steps / n_chains * n_thin,
+      thin = n_thin,
+      seed = seed
+    )
+    scovmat <- summary(mcmc_samples)
+    return(list(
+      covariance_matrix = scovmat,
+      samples = mcmc_samples,
+      model = jags_model
+    ))
+  }
 }

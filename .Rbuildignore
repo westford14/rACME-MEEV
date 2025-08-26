@@ -3,3 +3,6 @@
 ^base_r_script\.R$
 ^README\.Rmd$
 ^\.github$
+^extra/
+^Makefile
+^outputs/

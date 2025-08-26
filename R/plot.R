@@ -12,6 +12,7 @@
 #' @import reshape2
 #' @import plyr
 #' @import tools
+#' @import stats
 plot_covariates <- function(model_output, columns) {
   plots <- list()
   for (col in columns) {
@@ -23,29 +24,29 @@ plot_covariates <- function(model_output, columns) {
     columns[["naive"]] <- temp
 
     new_data <- data.frame(do.call("cbind", columns))
-    dens <- density(new_data$multivariate)
-    plot_data <- melt(new_data)
-    mu <- ddply(plot_data, "variable", summarise, grp.mean = mean(value))
+    dens <- stats::density(new_data$multivariate)
+    plot_data <- reshape2::melt(new_data)
+    mu <- plyr::ddply(plot_data, "variable", summarise, grp.mean = mean(value))
 
     plot <- (
-      ggplot(plot_data, aes(x = value, color = variable))
+      ggplot2::ggplot(plot_data, aes(x = value, color = variable))
       +
-        geom_density()
+        ggplot2::geom_density()
         +
-        geom_vline(
+        ggplot2::geom_vline(
           mu,
           mapping = aes(xintercept = grp.mean, color = variable),
           linetype = "dashed"
         )
         +
-        labs(
-          title = paste(toTitleCase(col), "Consumption"),
+        ggplot2::labs(
+          title = paste(tools::toTitleCase(col), "Consumption"),
           x = paste("N =", nrow(new_data), "Bandwidth =", round(dens[["bw"]], 5)),
           y = "Density",
           color = "Method\n"
         )
         +
-        scale_color_manual(
+        ggplot2::scale_color_manual(
           labels = c(
             bquote(hat(beta)[bold(X)[.(col)]]),
             bquote(hat(beta)[bold(W)[.(col)]])
