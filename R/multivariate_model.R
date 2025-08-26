@@ -13,7 +13,6 @@
 #' @param formula character The model formula
 #' @param data data.frame The data to model
 #' @param columns vector The columns that are relevant
-#' @param jags_model jgas.model A fitted pre-model
 #' @param a_c_matrix matrix The attenuation-contamination matrix
 #' @param n_burn numeric Number of draws to burn at the start, default = 1000
 #' @param n_thin numeric Thinning factor for the draws, default = 1
@@ -27,14 +26,11 @@
 #'                 variances need to be applied
 #' @return List with fitted models ready for further analysis
 #' @export
-#' @import rjags
 #' @import MCMCpack
-#' @import MCMCvis
 multivariate_model <- function(
     formula,
     data,
     columns,
-    jags_model,
     a_c_matrix,
     n_burn = 1000,
     n_thin = 1,
@@ -67,7 +63,7 @@ multivariate_model <- function(
 
   set.seed(seed)
 
-  naive_model <- MCMCregress(
+  naive_model <- MCMCpack::MCMCregress(
     formula,
     data = data,
     burnin = n_burn,

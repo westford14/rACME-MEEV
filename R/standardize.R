@@ -8,6 +8,7 @@
 #' @param data vector The vector to standardize
 #' @return List with the original standard deviation, mean,
 #'         and the standardized data
+#' @import stats
 standardize_with_return <- function(data) {
   stopifnot((is.vector(data) & !is.list(data)))
   stopifnot((is.vector(data) & length(data) > 1))
@@ -15,7 +16,7 @@ standardize_with_return <- function(data) {
 
   mean_orig <- mean(data)
   sd_orig <- sd(data)
-  std_data <- (data - mean(data)) / sd(data)
+  std_data <- (data - mean(data)) / stats::sd(data)
   list(
     std_data = std_data,
     mean_orig = mean_orig,

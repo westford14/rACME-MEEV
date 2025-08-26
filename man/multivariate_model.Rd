@@ -8,7 +8,6 @@ multivariate_model(
   formula,
   data,
   columns,
-  jags_model,
   a_c_matrix,
   n_burn = 1000,
   n_thin = 1,
@@ -25,8 +24,6 @@ multivariate_model(
 \item{data}{data.frame The data to model}
 
 \item{columns}{vector The columns that are relevant}
-
-\item{jags_model}{jgas.model A fitted pre-model}
 
 \item{a_c_matrix}{matrix The attenuation-contamination matrix}
 
