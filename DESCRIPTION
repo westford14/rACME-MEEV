@@ -12,4 +12,14 @@ Suggests:
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 Imports: 
-    rjags, MCMCpack, ggplot2, reshape2, plyr, coda, rstan, stats, utils, ggpubr, patchwork
+    rjags,
+    MCMCpack,
+    ggplot2,
+    reshape2,
+    plyr,
+    rstan,
+    stats,
+    utils,
+    ggpubr,
+    patchwork,
+    bayesplot

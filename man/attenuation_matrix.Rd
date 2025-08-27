@@ -21,5 +21,6 @@ deviations
 }
 \description{
 From the output JAGS model, create the needed attenuation
-contamination matrix for further analysis.
+contamination matrix for further analysis. Please be aware that
+this is multivariate so a minimum of 3 columns is needed.
 }
