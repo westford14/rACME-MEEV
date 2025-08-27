@@ -1,7 +1,8 @@
 #' Create Attenuation Contamination Matrix
 #'
 #' From the output JAGS model, create the needed attenuation
-#' contamination matrix for further analysis.
+#' contamination matrix for further analysis. Please be aware that
+#' this is multivariate so a minimum of 3 columns is needed.
 #'
 #' @param model_output list List of the mcmc summary and covariance matrix
 #' @param columns vector Vector of the column names that are being assessed
@@ -18,6 +19,7 @@ attenuation_matrix <- function(
     stan = FALSE) {
   stopifnot(is.list(model_output))
   stopifnot(length(columns) == length(validity_coefficients))
+  stopifnot(length(columns) > 2)
 
   if (stan) {
     cov_matrix <- model_output$covariance_matrix$summary
