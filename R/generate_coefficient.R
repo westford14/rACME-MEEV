@@ -32,16 +32,16 @@ generate_coefficient <- function(
   stopifnot(lower_bound > 0 && lower_bound < 1)
   stopifnot(upper_bound > 0 && upper_bound < 1)
   stopifnot(n > 0)
-  stopifnot(is.numeric(seed))
+
+  cv <- stats::qnorm((1 - interval) / 2, lower.tail = FALSE)
+  z_lower <- fisher_z_transform(lower_bound)
+  z_upper <- fisher_z_transform(upper_bound)
+  mu <- 0.5 * (z_lower + z_upper)
+  sd <- (0.5 * (z_upper - z_lower)) / cv
 
   set.seed(seed)
+  normal_dist <- stats::rnorm(n, mu, sd)
 
-  normal_dist <- normalize_coefficients(
-    n,
-    lower_bound,
-    upper_bound,
-    interval
-  )
   rho <- (exp(2 * mean(normal_dist)) - 1) / (exp(2 * mean(normal_dist)) + 1)
   rho
 }
