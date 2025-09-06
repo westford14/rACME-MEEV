@@ -22,4 +22,9 @@ Imports:
     utils,
     ggpubr,
     patchwork,
-    bayesplot
+    bayesplot,
+    doSNOW,
+    foreach,
+    snow,
+    parallelly,
+    dplyr

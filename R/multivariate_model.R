@@ -18,6 +18,11 @@
 #' @param n_thin numeric Thinning factor for the draws, default = 1
 #' @param n_steps numeric The total number of draws to run, default = 10,000
 #' @param seed numeric The random seed to set
+#' @param b0 numeric The prior mean of the beta
+#' @param capital_b_0 numeric The precision of the beta
+#' @param sampler character The sampler to use for the model
+#' @param c0 numeric Shape parameter for gamma
+#' @param d0 numeric Scale parameter for gamm
 #' @param univariate bool Whether or not to run the univariate model,
 #'                       default = TRUE
 #' @param sds list If you are running the univariate model, the listing of
@@ -36,6 +41,11 @@ multivariate_model <- function(
     n_thin = 1,
     n_steps = 10000,
     seed = 42,
+    b0 = 0,
+    capital_b_0 = 0.000001,
+    sampler = "Metropolis",
+    c0 = 0.001,
+    d0 = 0.001,
     univariate = FALSE,
     sds = NULL,
     variances = NULL) {
@@ -72,11 +82,11 @@ multivariate_model <- function(
     verbose = 0,
     seed = seed,
     beta.start = NA,
-    b0 = 0,
-    B0 = 0.000001,
-    sampler = "Metropolis",
-    c0 = 0.001,
-    d0 = 0.001
+    b0 = b0,
+    B0 = capital_b_0,
+    sampler = sampler,
+    c0 = c0,
+    d0 = d0
   )
 
   n_cols <- length(columns)

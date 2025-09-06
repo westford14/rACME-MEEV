@@ -13,6 +13,11 @@ multivariate_model(
   n_thin = 1,
   n_steps = 10000,
   seed = 42,
+  b0 = 0,
+  capital_b_0 = 1e-06,
+  sampler = "Metropolis",
+  c0 = 0.001,
+  d0 = 0.001,
   univariate = FALSE,
   sds = NULL,
   variances = NULL
@@ -34,6 +39,16 @@ multivariate_model(
 \item{n_steps}{numeric The total number of draws to run, default = 10,000}
 
 \item{seed}{numeric The random seed to set}
+
+\item{b0}{numeric The prior mean of the beta}
+
+\item{capital_b_0}{numeric The precision of the beta}
+
+\item{sampler}{character The sampler to use for the model}
+
+\item{c0}{numeric Shape parameter for gamma}
+
+\item{d0}{numeric Scale parameter for gamm}
 
 \item{univariate}{bool Whether or not to run the univariate model,
 default = TRUE}
