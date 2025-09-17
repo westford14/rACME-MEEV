@@ -7,6 +7,7 @@
 simulation_study(
   parameters,
   data,
+  target,
   formula,
   columns,
   stan = FALSE,
@@ -18,6 +19,8 @@ simulation_study(
 \item{parameters}{vector The validity parameters to use}
 
 \item{data}{data.frame The data to use for the simulation analysis}
+
+\item{target}{character The output data column to use}
 
 \item{formula}{character The formula for the model}
 

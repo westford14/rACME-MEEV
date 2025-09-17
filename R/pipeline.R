@@ -10,6 +10,8 @@
 #' @param columns vector The columns of the covariates
 #' @param stan bool If you would like to run with the Stan backend
 #' @param seed numeric The random seed to use
+#' @return list The output parameters
+#' @export
 pipeline <- function(
     data,
     formula,
@@ -26,7 +28,7 @@ pipeline <- function(
       stan = TRUE
     )
     model_output <- multivariate_model(
-      formula = ,
+      formula = formula,
       data = data,
       columns = columns,
       a_c_matrix = lambda$matrix,
@@ -39,7 +41,7 @@ pipeline <- function(
     output <- acme_model(data, columns, seed = seed)
     lambda <- attenuation_matrix(output, columns, parameters)
     model_output <- multivariate_model(
-      formula,
+      formula = formula,
       data = data,
       columns = columns,
       a_c_matrix = lambda$matrix,

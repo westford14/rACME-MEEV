@@ -12,6 +12,7 @@
 #' @param columns vector The columns to target
 #' @return List with all the appropriate things needed
 #'         for modelling with JAGS
+#' @export
 create_modelling_data <- function(data, columns) {
   stopifnot(is.data.frame(data))
   stopifnot(all(columns %in% names(data)))

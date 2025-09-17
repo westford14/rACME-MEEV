@@ -19,6 +19,9 @@ pipeline(data, formula, parameters, columns, stan = FALSE, seed = 42)
 
 \item{seed}{numeric The random seed to use}
 }
+\value{
+list The output parameters
+}
 \description{
 This is an unexported function that can run the entire
 pre-model, attenuation-contamination matrix, and model
