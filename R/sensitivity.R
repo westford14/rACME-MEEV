@@ -76,7 +76,8 @@ sensitivity_analysis <- function(
       "acme_model",
       "create_modelling_data",
       "create_stan_model_string",
-      "create_model_string"
+      "create_model_string",
+      "pipeline"
     )
   ) %dopar% {
     output <- pipeline(

@@ -14,6 +14,7 @@
 #'
 #' @param parameters vector The validity parameters to use
 #' @param data data.frame The data to use for the simulation analysis
+#' @param target character The output data column to use
 #' @param formula character The formula for the model
 #' @param columns vector The columns within the data for the covariates
 #' @param stan boolean Whether or not to run with the Stan backend
@@ -27,10 +28,13 @@
 #' @import foreach
 #' @import doSNOW
 #' @import dplyr
+#' @import stats
+#' @import fitdistrplus
 #' @importFrom foreach %dopar%
 simulation_study <- function(
     parameters,
     data,
+    target,
     formula,
     columns,
     stan = FALSE,
@@ -41,16 +45,50 @@ simulation_study <- function(
     cores <- 1
   }
 
+  dists <- list()
+  for (col in columns) {
+    fit_g <- fitdistrplus::fitdist(data[[col]], "gamma")
+    shape <- fit_g[["estimate"]][["shape"]]
+    rate <- fit_g[["estimate"]][["rate"]]
+    dists[[col]] <- list(shape = shape, rate = rate)
+  }
+  fit_n <- fitdistrplus::fitdist(data[[target]], "lnorm")
+  dists[[target]] <- list(
+    meanlog = fit_n[["estimate"]][["meanlog"]],
+    sdlog = fit_n[["estimate"]][["sdlog"]]
+  )
+
   cl <- snow::makeCluster(cores, outfile = "")
   doSNOW::registerDoSNOW(cl)
   pb <- utils::txtProgressBar(max = draws, style = 3)
   progress <- function(n) setTxtProgressBar(pb, n)
   opts <- list(progress = progress)
 
+  total_data <- nrow(data)
   frame_grid <- list()
+  temp_seed <- 100
   for (i in 1:draws) {
     name <- paste0("iteration_", i)
-    sample <- data[sample(nrow(data), nrow(data), replace = TRUE), ]
+
+    column_data <- list()
+    for (col in columns) {
+      dist <- dists[[col]]
+      set.seed(temp_seed + i)
+      column_data[[col]] <- stats::rgamma(
+        total_data,
+        shape = dist[["shape"]],
+        rate = dist[["rate"]]
+      )
+    }
+
+    sample <- data.frame(column_data)
+    set.seed(temp_seed + i)
+    sample[[target]] <- stats::rlnorm(
+      total_data,
+      meanlog = dists[[target]][["meanlog"]],
+      sdlog = dists[[target]][["sdlog"]]
+    )
+
     frame_grid[[name]] <- list(
       data = sample
     )
@@ -67,7 +105,8 @@ simulation_study <- function(
       "acme_model",
       "create_modelling_data",
       "create_stan_model_string",
-      "create_model_string"
+      "create_model_string",
+      "pipeline"
     )
   ) %dopar% {
     output <- pipeline(

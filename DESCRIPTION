@@ -27,4 +27,5 @@ Imports:
     foreach,
     snow,
     parallelly,
-    dplyr
+    dplyr,
+    fitdistrplus
