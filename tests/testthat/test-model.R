@@ -41,3 +41,84 @@ test_that("acme modelling works", {
   )
   acme_model(df, names(df))
 })
+
+test_that("acme modelling correct output type", {
+  df <- data.frame(
+    list(x = c(1, 2, 3, 4), y = c(2, 3, 4, 5))
+  )
+  expect_equal(
+    is.list(acme_model(df, names(df))),
+    TRUE
+  )
+})
+
+test_that("acme modelling correct output", {
+  df <- data.frame(
+    list(
+      x = c(1, 2, 3, 4),
+      y = c(2, 3, 4, 5),
+      z = c(3, 4, 5, 6)
+    )
+  )
+  output <- acme_model(df, names(df), seed = 42)
+  means <- colMeans(data.frame(output$samples[[1]]))
+
+  # test mean value of samples
+  expect_equal(
+    as.vector(means[1]),
+    1
+  )
+  expect_equal(
+    as.vector(means[2]),
+    0.7164143,
+    tolerance = 0.01
+  )
+  expect_equal(
+    as.vector(means[3]),
+    0.7177638,
+    tolerance = 0.01
+  )
+  expect_equal(
+    as.vector(means[4]),
+    0.7164143,
+    tolerance = 0.01
+  )
+  expect_equal(
+    as.vector(means[5]),
+    1
+  )
+  expect_equal(
+    as.vector(means[6]),
+    0.7189397,
+    tolerance = 0.01
+  )
+  expect_equal(
+    as.vector(means[7]),
+    0.7177638,
+    tolerance = 0.01
+  )
+  expect_equal(
+    as.vector(means[8]),
+    0.7189397,
+    tolerance = 0.01
+  )
+  expect_equal(
+    as.vector(means[9]),
+    1
+  )
+  expect_equal(
+    as.vector(means[10]),
+    1.3712500,
+    tolerance = 0.01
+  )
+  expect_equal(
+    as.vector(means[11]),
+    1.3687147,
+    tolerance = 0.01
+  )
+  expect_equal(
+    as.vector(means[12]),
+    1.3717495,
+    tolerance = 0.01
+  )
+})
