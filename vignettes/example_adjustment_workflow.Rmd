@@ -1,0 +1,198 @@
+---
+title: "Example Multivariate Adjustment Workflow"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{example_adjustment_workflow}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+suppressWarnings(library(rACMEMEEV))
+```
+
+This vignette will guide the user in how to apply this library to a synthetic dataset.
+There are other more complete vignettes that show how exactly to use this dataset on
+"realworld" data, but, the purpose here is to allow the user to feel more comfortable in
+what this library is trying to accomplish and all the various ins and outs of the library.
+This library is built upon the work by [Muoka et al. 2020](#References).
+
+## Setting up the Workflow
+
+I'm going to skip over a lot of the background information on why measurement error
+adjustment is important in dietary exposure assessment as there are many far more detailed
+tutorials on this. We should begin by creating a custom dataset that can be used throughout
+the entirety of this example. Normally dietary consumption data is characterized by a
+gamma distribution ([Passerelli et al. 2022](#References)), so we that's the data that will be generated.
+It is very important to note here that this library will standardize (i.e. make the
+consumption distribution more normal) by default. So, please be careful when applying
+this library to your dataset.
+
+```{r}
+x <- rgamma(100, shape = 1, rate = 0.01)
+y <- rgamma(100, shape = 3, rate = 0.02)
+z <- rgamma(100, shape = 3, rate = 0.3)
+```
+
+These will represent random consumption values, and accordingly, we will generate some
+example output data that is linked to these input datas.
+
+```{r}
+output <- rlnorm(100, meanlog = 3.5, sdlog = 0.2)
+```
+
+Thus, the full dataset looks like:
+
+```{r}
+df <- data.frame(
+  list(x = x, y = y, z = z, output = output)
+)
+
+head(df, 10)
+```
+
+### Generate Validity Coefficients
+
+To adjust for measurement error in our values of `x`, `y`, and `z`, we will need to
+generate some validity coefficients. These validity coefficients will normally be based
+on plausible ranges found in the literature. What is nice about this library is that
+the validity coefficient generated is treated as a normal distribution between two 
+plausible values.
+
+```{r}
+x_v_coef <- generate_coefficient(1000, 0.4, 0.7, 0.95)
+y_v_coef <- generate_coefficient(1000, 0.5, 0.7, 0.95)
+z_v_coef <- generate_coefficient(1000, 0.3, 0.6, 0.95)
+```
+
+### Pre-Model Fitting
+
+A pre-model is needed for to solve for the covariances in the observed data. This covariance
+structure will enable us to solve the attenuation-contamination matrix in a subsequent step.
+
+```{r}
+output <- acme_model(df, c("x", "y", "z"))
+```
+
+The posterior of this model can be sampled using either a JAGS or Stan sampler, but 
+the Stan sampler should be treated as experimental. In Muoka et. al 2020's paper, the JAGS
+backend was used. 
+
+With this fitted model, a summary of the covariance structure can be assessed:
+
+```{r}
+output$covariance_matrix
+```
+
+And the model used to solve can be viewed:
+
+```{r}
+output$model
+```
+
+### Attenutation Contamination Matrix
+
+Now the attenuation contamination matrix can be solved. This matrix will allow for the
+error structure to be used in adjusting a model based on the various exposure estimates.
+
+```{r}
+validity_coefficients <- c(x_v_coef, y_v_coef, z_v_coef)
+lambda <- attenuation_matrix(output, c("x", "y", "z"), validity_coefficients)
+```
+
+The diagonal values of the matrix are subsequentally used to adjust a fitted model in
+the next step.
+
+```{r}
+lambda$matrix
+```
+
+### Multivariate Model
+
+Now that we have solved for the attenuation-contamination matrix, a model can be fitted
+and comparisons can be made between a naive model (i.e. no error adjustment) and the
+multivariate adjusted model.
+
+```{r}
+model_output <- multivariate_model(
+  "output ~ x + y + z",
+  data = df,
+  columns = c("x", "y", "z"),
+  a_c_matrix = lambda$matrix,
+  sds = lambda$sds,
+  variances = lambda$variances,
+  univariate = TRUE
+)
+```
+
+Please note that the `univariate = TRUE` argument specifies that the naive model object 
+should be returned. This allows for plotting and comparisons to be made.
+
+```{r}
+summary(model_output$naive)
+summary(model_output$multivariate)
+```
+
+### Comparing Between Naive and Multivariate
+
+Now comparisons can be made to show how the fitted coefficients in the specified 
+model of `output ~ x + y + z` change in the presence of the error adjustment model.
+
+```{r}
+plots <- plot_covariates(model_output, c("x", "y", "z"))
+plots$x
+plots$y
+plots$z
+```
+
+Though it is difficult to make direct inferences from how these coefficients change
+with the adjusted model. The end goal here is to allow for a quick adjustment
+when expensive validation studies are not possible. The National Cancer Institute
+has its own error adjustment model ([Zhang et. al 2011](#References)) that can be
+used as well. They offer their own vignettes that can be used to understand 
+other idiosyncracies of measurement error adjustment. 
+
+### Traceplots and ACFs
+
+If you would like, the traceplots and ACFs are available for all fitted models.
+
+Traceplots:
+```{r}
+traceplots(model_output$naive, c("x", "y", "z"))
+```
+
+ACF Plots:
+```{r}
+acf_plots(model_output$naive, c("x", "y", "z"))
+```
+
+### References
+1. Muoka, A. K., Agogo, G. O., Ngesa, O. O., & Mwambi, H. G. (2020b). A
+    Method to adjust for measurement error in multiple exposure
+    variables measured with correlated errors in the absence of an
+    internal validation study. F1000Research, 9, 1486.
+    <https://doi.org/10.12688/f1000research.27892.1>
+2. Passarelli, S., Free, C. M., Allen, L. H., Batis, C., Beal, T., Biltoft-Jensen,
+    A. P., Bromage, S., Cao, L., Castellanos-Gutiérrez, A., Christensen, T., Crispim,
+    S. P., Dekkers, A., De Ridder, K., Kronsteiner-Gicevic, S., Lee, C., Li, Y.,
+    Moursi, M., Moyersoen, I., Schmidhuber, J., … Golden, C. D. (2022). 
+    Estimating national and subnational nutrient intake distributions of global diets.
+    The American Journal of Clinical Nutrition, 116(2), 551–560.
+    <https://doi.org/10.1093/ajcn/nqac108>
+3. Zhang, S., Midthune, D., Guenther, P. M., Krebs-Smith, S. M., Kipnis,
+    V., Dodd, K. W., Buckman, D. W., Tooze, J. A., Freedman, L., & Carroll, R. J. (2011).
+    A NEW MULTIVARIATE MEASUREMENT ERROR MODEL WITH ZERO-INFLATED DIETARY DATA, AND
+    ITS APPLICATION TO DIETARY ASSESSMENT. The Annals of Applied Statistics, 5(2B),
+    1456–1487. <https://doi.org/10.1214/10-AOAS446>
+
+
+
+### Maintainers
+* westford14

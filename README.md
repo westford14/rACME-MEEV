@@ -52,7 +52,7 @@ lambda <- attenuation_matrix(output, columns, validity_coefficients)
 # Fit the multivariate model
 model_output <- multivariate_model(
   "target ~ fruit + veg + tobacco",
-  data = dataNCD,
+  data = data,
   columns = c("fruit", "veg", "tobacco"),
   jags_model = output$model,
   a_c_matrix = lambda$matrix,
@@ -100,7 +100,7 @@ lambda <- attenuation_matrix(output, columns, validity_coefficients, stan = TRUE
 # Fit the multivariate model
 model_output <- multivariate_model(
   "target ~ fruit + veg + tobacco",
-  data = dataNCD,
+  data = data,
   columns = c("fruit", "veg", "tobacco"),
   jags_model = output$model,
   a_c_matrix = lambda$matrix,
