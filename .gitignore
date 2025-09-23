@@ -16,3 +16,4 @@ base_r_script.R
 # Extra
 extra/
 outputs/
+inst/doc

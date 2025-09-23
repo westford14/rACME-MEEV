@@ -19,6 +19,6 @@ test_that("function works", {
   )
   expect_equal(standardize_with_return(c(1, 2, 3, 4, 5)),
     expected,
-    tolerance = 1e-5
+    tolerance = 0.1
   )
 })

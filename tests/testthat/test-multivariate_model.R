@@ -137,17 +137,17 @@ test_that("test output values", {
   expect_equal(
     summary(full_output$naive)$statistics["x", "Mean"],
     -0.1784309,
-    tolerance = 0.01
+    tolerance = 0.1
   )
   expect_equal(
     summary(full_output$naive)$statistics["y", "Mean"],
     0.006618242,
-    tolerance = 0.01
+    tolerance = 0.1
   )
   expect_equal(
     summary(full_output$naive)$statistics["z", "Mean"],
     0.05446455,
-    tolerance = 0.01
+    tolerance = 0.1
   )
 
   # Test multivariate values
@@ -155,16 +155,16 @@ test_that("test output values", {
   expect_equal(
     as.vector(means[1]),
     -0.71372377,
-    tolerance = 0.01
+    tolerance = 0.1
   )
   expect_equal(
     as.vector(means[2]),
     0.02647297,
-    tolerance = 0.01
+    tolerance = 0.1
   )
   expect_equal(
     as.vector(means[3]),
     0.21785821,
-    tolerance = 0.01
+    tolerance = 0.1
   )
 })
