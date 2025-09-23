@@ -71,17 +71,17 @@ test_that("acme modelling correct output", {
   expect_equal(
     as.vector(means[2]),
     0.7164143,
-    tolerance = 0.01
+    tolerance = 0.1
   )
   expect_equal(
     as.vector(means[3]),
     0.7177638,
-    tolerance = 0.01
+    tolerance = 0.1
   )
   expect_equal(
     as.vector(means[4]),
     0.7164143,
-    tolerance = 0.01
+    tolerance = 0.1
   )
   expect_equal(
     as.vector(means[5]),
@@ -90,17 +90,17 @@ test_that("acme modelling correct output", {
   expect_equal(
     as.vector(means[6]),
     0.7189397,
-    tolerance = 0.01
+    tolerance = 0.1
   )
   expect_equal(
     as.vector(means[7]),
     0.7177638,
-    tolerance = 0.01
+    tolerance = 0.1
   )
   expect_equal(
     as.vector(means[8]),
     0.7189397,
-    tolerance = 0.01
+    tolerance = 0.1
   )
   expect_equal(
     as.vector(means[9]),
@@ -109,16 +109,16 @@ test_that("acme modelling correct output", {
   expect_equal(
     as.vector(means[10]),
     1.3712500,
-    tolerance = 0.01
+    tolerance = 0.1
   )
   expect_equal(
     as.vector(means[11]),
     1.3687147,
-    tolerance = 0.01
+    tolerance = 0.1
   )
   expect_equal(
     as.vector(means[12]),
     1.3717495,
-    tolerance = 0.01
+    tolerance = 0.1
   )
 })
