@@ -1,0 +1,218 @@
+---
+title: "JAGS vs. Stan"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{jags-v-stan}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+suppressWarnings(library(rACMEMEEV))
+```
+
+Here we will compare and contrast the two different sampling backends that are
+available to users of this library. There are far more indepth reviews of when
+to use which sampler and why ([Beraha et al. 2021](#References); [Homan et al. 2014](#References)),
+but, nevertheless, we can further add some guidance for this specific library.
+
+### Setting up the Workflow. 
+
+I'm going to skip over a lot of the background information on why measurement error
+adjustment is important in dietary exposure assessment as there are many far more detailed
+tutorials on this. We should begin by creating a custom dataset that can be used throughout
+the entirety of this example. Normally dietary consumption data is characterized by a
+gamma distribution ([Passerelli et al. 2022](#References)), so we that's the data that will be generated.
+It is very important to note here that this library will standardize (i.e. make the
+consumption distribution more normal) by default. So, please be careful when applying
+this library to your dataset.
+
+```{r}
+x <- rgamma(100, shape = 1, rate = 0.01)
+y <- rgamma(100, shape = 3, rate = 0.02)
+z <- rgamma(100, shape = 3, rate = 0.3)
+```
+
+These will represent random consumption values, and accordingly, we will generate some
+example output data that is linked to these input datas.
+
+```{r}
+output <- rlnorm(100, meanlog = 3.5, sdlog = 0.2)
+```
+
+Thus, the full dataset looks like:
+
+```{r}
+df <- data.frame(
+  list(x = x, y = y, z = z, output = output)
+)
+
+head(df, 10)
+
+x_v_coef <- generate_coefficient(1000, 0.4, 0.7, 0.95)
+y_v_coef <- generate_coefficient(1000, 0.5, 0.7, 0.95)
+z_v_coef <- generate_coefficient(1000, 0.3, 0.6, 0.95)
+```
+```
+
+### Stan vs. JAGS Pre-Model
+
+With the data generated, we can now fit the pre-model to solve for the covariances
+in the observed data. [Muoka et. al 2021](#References) created a very clever situation
+where the JAGS sampler will converge quite quickly as the inverse-wishart distribution
+is used to create a semi-conjugate prior situation. This of course does not guarantee
+that the sampled posterior will be fully realized, but it does give the sampler that
+much more of a chance to converge. From an API perspective, the same function to fit
+the pre-model with a JAGS backend can be used to fit with a Stan backend. The only thing
+that needs to be adjusted is the `stan = TRUE` parameter for the function.
+
+```{r}
+jags_output <- acme_model(df, c("x", "y", "z"))
+```
+
+```{r}
+stan_output <- acme_model(df, c("x", "y", "z"), stan = TRUE)
+```
+
+Both of the models can be then introspected to see the underlying JAGS / Stan model code
+along with samples to get a better understanding of how the samplers can yield slightly
+different posteriors.
+
+```{r}
+jags_output$model
+```
+
+```{r}
+stan_output$model
+```
+
+To show exactly how the samplers can create differing results. We can directly look at
+the different metrics for the solved covariance structure as well as the actual resultant
+covariance matrix.
+
+```{r}
+jags_output$covariance_matrix
+```
+
+```{r}
+stan_output$covariance_matrix
+```
+
+As you can see the `sigma` values are quite similar, but the `rho` values vary quite a bit.
+This has direct implications for what the resultant structure of the output coefficient 
+adjustments will look like. As referenced above, the samplers explore the posterior space in
+a bit of a different way, so this can lead to divergences between the two results. This should
+not be viewed as an error as the posterior here is not mathematically directly estimatable,
+but it is important to assess, for you, what makes more sense. The research team for this
+library believes that the JAGS sampler is best, so it is the default argument. All results
+from the Stan sampler should be viewed as experimental and not necessarily supported by the
+maintainers.
+
+### Stan vs. JAGS Error Adjustment
+
+With the pre-model fit, now we can assess how the resulting coefficients are different depending
+on which sampler is used.
+
+```{r}
+validity_coefficients <- c(x_v_coef, y_v_coef, z_v_coef)
+jags_lambda <- attenuation_matrix(
+  jags_output,
+  c("x", "y", "z"),
+  validity_coefficients
+)
+jags_model_output <- multivariate_model(
+  "output ~ x + y + z",
+  data = df,
+  columns = c("x", "y", "z"),
+  a_c_matrix = jags_lambda$matrix,
+  sds = jags_lambda$sds,
+  variances = jags_lambda$variances,
+  univariate = TRUE
+)
+```
+
+```{r}
+validity_coefficients <- c(x_v_coef, y_v_coef, z_v_coef)
+stan_lambda <- attenuation_matrix(
+  stan_output,
+  c("x", "y", "z"),
+  validity_coefficients,
+  stan = TRUE
+)
+stan_model_output <- multivariate_model(
+  "output ~ x + y + z",
+  data = df,
+  columns = c("x", "y", "z"),
+  a_c_matrix = stan_lambda$matrix,
+  sds = stan_lambda$sds,
+  variances = stan_lambda$variances,
+  univariate = TRUE
+)
+```
+
+Please be aware that the `stan = TRUE` parameter is passed to each step of the adjustment 
+pipeline as the underlying libraries have slightly different APIs. This will prevent unexpected
+errors if you accidentally try to pass a `rJags` object to a function expecting a
+Stan object.
+
+```{r}
+jags_plots <- plot_covariates(jags_model_output, c("x", "y", "z"))
+jags_plots$x
+jags_plots$y
+jags_plots$z
+```
+
+```{r}
+stan_plots <- plot_covariates(stan_model_output, c("x", "y", "z"))
+stan_plots$x
+stan_plots$y
+stan_plots$z
+```
+
+Again, the differing pre-model results yield different adjustments for our synthetic
+dataset. It is worth repeating that one is not necessarily more accurate, but the
+divergences should be treated as important data points when assessing the measurement
+error structure in your own dataset.
+
+### Traceplots
+
+And accordingly, the traceplots can be assessed to make sure that both the samplers
+have converged.
+
+```{r}
+traceplots(stan_output$samples, c("x", "y", "z"), pre_model = TRUE, stan = TRUE)
+```
+
+```{r}
+traceplots(jags_output$samples, c("x", "y", "z"), pre_model = TRUE)
+```
+
+### References 
+
+1. Passarelli, S., Free, C. M., Allen, L. H., Batis, C., Beal, T., Biltoft-Jensen,
+    A. P., Bromage, S., Cao, L., Castellanos-Gutiérrez, A., Christensen, T., Crispim,
+    S. P., Dekkers, A., De Ridder, K., Kronsteiner-Gicevic, S., Lee, C., Li, Y.,
+    Moursi, M., Moyersoen, I., Schmidhuber, J., … Golden, C. D. (2022). 
+    Estimating national and subnational nutrient intake distributions of global diets.
+    The American Journal of Clinical Nutrition, 116(2), 551–560.
+    <https://doi.org/10.1093/ajcn/nqac108>
+2. Beraha, M., Falco, D., & Guglielmi, A. (2021). JAGS, NIMBLE, Stan: A detailed
+    comparison among Bayesian MCMC software (No. arXiv:2107.09357).
+    arXiv. https://doi.org/10.48550/arXiv.2107.09357
+3. Homan, M. D., & Gelman, A. (2014). The No-U-turn sampler: Adaptively setting path
+    lengths in Hamiltonian Monte Carlo. J. Mach. Learn. Res., 15(1), 1593–1623.
+4. Muoka, A. K., Agogo, G. O., Ngesa, O. O., & Mwambi, H. G. (2020b). A
+    Method to adjust for measurement error in multiple exposure
+    variables measured with correlated errors in the absence of an
+    internal validation study. F1000Research, 9, 1486.
+    <https://doi.org/10.12688/f1000research.27892.1>
+
+### Maintainers
+* westford14
