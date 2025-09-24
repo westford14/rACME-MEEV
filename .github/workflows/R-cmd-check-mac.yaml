@@ -1,0 +1,48 @@
+on:
+  push:
+    branches:
+      - "release-[0-9]+.[0-9]+.[0-9]+"
+
+name: R-CMD-check.yaml
+
+permissions: read-all
+
+jobs:
+  R-CMD-check:
+    runs-on: ${{ matrix.config.os }}
+
+    name: ${{ matrix.config.os }} (${{ matrix.config.r }})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - {os: macos-latest,   r: 'release'}
+
+    env:
+      GITHUB_PAT: ${{ secrets.TOKEN_GITHUB }}
+      R_KEEP_PKG_SOURCE: yes
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install jags
+        run: |
+          /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+          brew install R
+          brew install pkg-config
+          brew install jags
+          brew install pandoc
+        shell: bash
+
+      - name: install pak and pandoc
+        run: |
+          install.packages(c('pak', 'pandoc'), repos=c(CRAN="https://cran.r-project.org"))
+        shell: Rscript {0}
+      
+      - name: install rACME-MEEV and test
+        run: |
+          Rscript -e "install.packages('devtools', repos = c(CRAN = 'https://cran.r-project.org')); library('devtools'); devtools::install(); devtools::check(error_on = 'error'); devtools::test();"
+        shell: bash
+
+      
