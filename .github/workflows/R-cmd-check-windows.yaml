@@ -1,0 +1,70 @@
+# Workflow derived from https://github.com/r-lib/actions/tree/v2/examples
+# Need help debugging build failures? Start at https://github.com/r-lib/actions#where-to-find-help
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+env:
+  BUILD_LOC: "./build"
+  BRANCH: ${{ github.head_ref || github.ref_name }}
+  JAGS_MAJORV: '4'
+  JAGS_VERSION: '4.3.1'
+  JAGS_URL: "https://sourceforge.net/projects/mcmc-jags/files/JAGS"
+
+jobs:
+  setup-and-install:
+    name: windows-latest R release
+    runs-on: windows-latest
+    env:
+      R_KEEP_PKG_SOURCE: yes
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install pak
+        run: |
+          install.packages(c('pak', 'pandoc'), repos=c(CRAN="https://cran.r-project.org"))
+        shell: Rscript {0}
+
+      - name: install GSL
+        run: |
+          Import-Module bitstransfer
+          New-Item -ItemType Directory -Force -Path "C:\Program Files\cygwin"
+          start-bitstransfer -source https://cygwin.com/setup-x86_64.exe "C:\Program Files\cygwin\setup-x86_64.exe"
+          Start-Process -Wait -FilePath "C:\Program Files\cygwin\setup-x86_64.exe" -ArgumentList "--quiet-mode --packages=gsl --site=https://cygwin.mirror.constant.com" -PassThru
+          
+      - name: install JAGS
+        run: |
+          Import-Module bitstransfer
+          New-Item -ItemType Directory -Force -Path "C:\Program Files\JAGS\JAGS-${{ env.JAGS_VERSION }}"
+          start-bitstransfer -source ${{ env.JAGS_URL }}/${{ env.JAGS_MAJORV }}.x/Windows/JAGS-${{ env.JAGS_VERSION }}.exe/download  "C:\Program Files\JAGS\JAGS-${{ env.JAGS_VERSION }}\JAGS-${{ env.JAGS_VERSION }}.exe"
+          Start-Process -Wait -FilePath "C:\Program Files\JAGS\JAGS-${{ env.JAGS_VERSION }}\JAGS-${{ env.JAGS_VERSION }}.exe" -ArgumentList "/S" -PassThru
+
+      - name: install rjags separately
+        run: |
+            Sys.setenv(JAGS_HOME="C:/Program Files/JAGS/JAGS-${{ env.JAGS_VERSION }}")
+            install.packages("rjags", repos=c(CRAN="https://cran.r-project.org"))
+            library("rjags")
+        shell: Rscript {0}
+
+      - uses: r-lib/actions/setup-pandoc@v2
+
+      - name: install devtools
+        run: |
+          install.packages('devtools', repos = c(CRAN = 'https://cran.r-project.org'))
+        shell: Rscript {0}
+
+      - name: install rACME-MEEV
+        run: |
+          devtools::install()
+        shell: Rscript {0}
+      
+      - name: check rACME-MEEV
+        run: |
+          devtools::check(error_on = 'error')
+        shell: Rscript {0}
+
+      - name: test rACME-MEEV
+        run: |
+          devtools::test()
+        shell: Rscript {0}
