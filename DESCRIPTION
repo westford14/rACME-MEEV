@@ -32,5 +32,6 @@ Imports:
     dplyr,
     fitdistrplus,
     BH,
-    RcppEigen
+    RcppEigen,
+    glmnet
 VignetteBuilder: knitr
