@@ -16,74 +16,108 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 suppressWarnings(library(rACMEMEEV))
+suppressWarnings(library(glmnet))
+set.seed(420)
 ```
 
-This vignette will guide the user in how to apply this library to a synthetic dataset.
-There are other more complete vignettes that show how exactly to use this dataset on
-"realworld" data, but, the purpose here is to allow the user to feel more comfortable in
-what this library is trying to accomplish and all the various ins and outs of the library.
+Let's imagine a scenario where you have recently done a survey and gathered information on three different food items that people consume via an FFQ. For ease, let's call them `x`, `y`, and `z`. Now, because measuring what people eat is quite complicated and not necessarily always accurate, there is a tacit assumption that there is measurement error. Normally, in these circumstances, researchers will conduct a validation study to understand how different the overall population deviates from the validation study. This is typically done by using a more accurate form of dietary assessment (24 hour recall or urinary recovery biomarkers). Often times this is a very costly step and not always practical. In these cases, we can turn to multivariate measurement error adjustment. The rest of this vignette will demo how to use this library and show its performance.
 This library is built upon the work by [Muoka et al. 2020](#References).
 
 ## Setting up the Workflow
 
-I'm going to skip over a lot of the background information on why measurement error
-adjustment is important in dietary exposure assessment as there are many far more detailed
-tutorials on this. We should begin by creating a custom dataset that can be used throughout
-the entirety of this example. Normally dietary consumption data is characterized by a
-gamma distribution ([Passerelli et al. 2022](#References)), so we that's the data that will be generated.
-It is very important to note here that this library will standardize (i.e. make the
-consumption distribution more normal) by default. So, please be careful when applying
-this library to your dataset.
+Normally dietary consumption data is characterized by a gamma distribution ([Passerelli et al. 2022](#References)), so we that's the data that will be generated. But, because we know that there is measurement error in the gathering of our experimental variables of `x`, `y`, and `z`, we will need to taint our data to simulate this. This can be done by introducing an additive $\epsilon$ value to each of the variables, which will simulate by adding a normally distributed random error term. 
+
+Before we go further, we will generate an output variable, conveniently named `output`, that is a linear combination of the three non-measurement error tainted exposures. With this, we can then fit a model that shows us how the three exposures are related to the output. This gives us the ultimate "true" relationship between the exposures and output that is being clouded by the measurement error. Which, also allows us to look back at the end and assess how close the adjusted covariates via multivariate measurement error adjustment are to the "true" relationship.
 
 ```{r}
-x <- rgamma(100, shape = 1, rate = 0.01)
-y <- rgamma(100, shape = 3, rate = 0.02)
-z <- rgamma(100, shape = 3, rate = 0.3)
+simulate_gamma_mix <- function(n) {
+    a1 <- 3
+    a2 <- 4
+    a3 <- 5
+    shape1 <- 2
+    rate1 <- 2
+    shape2 <- 3
+    rate2 <- 3
+    shape3 <- 5
+    rate3 <- 5
+
+    x <- rgamma(n, shape1, rate1)
+    y <- rgamma(n, shape2, rate2)
+    z <- rgamma(n, shape3, rate3)
+    output <- a1 * x + a2 * y + a3 * z
+
+    frame <- data.frame(
+      list(
+        output = output,
+        x = x,
+        y = y,
+        z = z
+      )
+    )
+    return(frame)
+}
 ```
 
-These will represent random consumption values, and accordingly, we will generate some
-example output data that is linked to these input datas.
+The above code block generates three gamma distributions of input consumption data with a yielded output that is a linear combination of these inputs.
 
 ```{r}
-output <- rlnorm(100, meanlog = 3.5, sdlog = 0.2)
-```
-
-Thus, the full dataset looks like:
-
-```{r}
-df <- data.frame(
-  list(x = x, y = y, z = z, output = output)
-)
-
+df <- simulate_gamma_mix(100)
 head(df, 10)
 ```
 
+Now, we can fit a model and see what the resultant coefficients are for each of `x`, `y`, and `z`. 
+
+```{r}
+model <- glm("output ~ x + y + z", data = df)
+summary(model)
+```
+
+As we can see, given the above code, the output is directly related to the combination of the three input exposures and the coefficients are the specified `a1`, `a2`, and `a3` parameters as well.
+
+### Generate the Tainted Dataset
+
+Now we can see the tainted dataset. Using the created dataframe, we can then add a normally distributed error term, the measurement error, to each of the exposure estimates.
+
+```{r}
+tainted_df <- df
+tainted_df$x <- df$x + rnorm(100, mean = 2)
+tainted_df$y <- df$y + rnorm(100, mean = 2)
+tainted_df$z <- df$z + rnorm(100, mean = 2)
+head(tainted_df, 10)
+```
+
+This resultant tainted dataset can now be fit with a similar GLM, and then we can see how this measurement error effects real-world studies.
+
+```{r}
+tainted_model <- glm("output ~ x + y + z", data = tainted_df)
+summary(tainted_model)
+```
+
+It is clear to see how this "measurement error" has significantly impacted our view of the world. The estimated coefficients on `x`, `y`, and `z` are vastly different and do not at all reflect the set values of 3, 4, and 5. Thus, we can see how and why this measurement error adjustment is so important.
+
 ### Generate Validity Coefficients
 
-To adjust for measurement error in our values of `x`, `y`, and `z`, we will need to
-generate some validity coefficients. These validity coefficients will normally be based
-on plausible ranges found in the literature. What is nice about this library is that
-the validity coefficient generated is treated as a normal distribution between two 
-plausible values.
+As stated above, in the absence of the running a validation study, we can leverage literature based validity coefficients to help adjust for the measurement error. Because this developed method is Bayesian in nature, we can instead use a distribution over the range of the validity coefficients to add more prior data. In this library the `generate_coefficient` function can easily do this for us. This performs a [Fisher-Z transformation](#References) on the values to normalize the distribution and then back transforms it to yield the resultant mean value of the distribution. Below is an example of this. 
 
 ```{r}
 x_v_coef <- generate_coefficient(1000, 0.4, 0.7, 0.95)
 y_v_coef <- generate_coefficient(1000, 0.5, 0.7, 0.95)
 z_v_coef <- generate_coefficient(1000, 0.3, 0.6, 0.95)
+
+cat(sprintf(
+  "X validity coefficient: %s\nY validity coefficient: %s\nZ validity coefficient: %s", x_v_coef, y_v_coef, z_v_coef
+))
 ```
 
 ### Pre-Model Fitting
 
-A pre-model is needed for to solve for the covariances in the observed data. This covariance
-structure will enable us to solve the attenuation-contamination matrix in a subsequent step.
+A pre-model is needed for to solve for the covariances in the observed data. This covariance structure will allow us to then continue and solve the attenuation-contamination matrix and finally adjust the coefficients of the fitted model. Please see the references for a much more in-depth analysis of the proposed methodology as well as assumptions and decisions made along the way.
 
 ```{r}
-output <- acme_model(df, c("x", "y", "z"))
+output <- acme_model(tainted_df, c("x", "y", "z"))
 ```
 
-The posterior of this model can be sampled using either a JAGS or Stan sampler, but 
-the Stan sampler should be treated as experimental. In Muoka et. al 2020's paper, the JAGS
-backend was used. 
+The posterior of this model can be sampled using either a JAGS or Stan sampler, but the Stan sampler should be treated as experimental. In Muoka et. al 2020's paper, the JAGS backend was used. 
 
 With this fitted model, a summary of the covariance structure can be assessed:
 
@@ -99,16 +133,14 @@ output$model
 
 ### Attenutation Contamination Matrix
 
-Now the attenuation contamination matrix can be solved. This matrix will allow for the
-error structure to be used in adjusting a model based on the various exposure estimates.
+Now the attenuation contamination matrix can be solved. This matrix will allow for the error structure to be used in adjusting a model based on the various exposure estimates.
 
 ```{r}
 validity_coefficients <- c(x_v_coef, y_v_coef, z_v_coef)
 lambda <- attenuation_matrix(output, c("x", "y", "z"), validity_coefficients)
 ```
 
-The diagonal values of the matrix are subsequentally used to adjust a fitted model in
-the next step.
+The diagonal values of the matrix are subsequently used to adjust a fitted model in the next step to adjust the resultant coefficients.
 
 ```{r}
 lambda$matrix
@@ -116,14 +148,12 @@ lambda$matrix
 
 ### Multivariate Model
 
-Now that we have solved for the attenuation-contamination matrix, a model can be fitted
-and comparisons can be made between a naive model (i.e. no error adjustment) and the
-multivariate adjusted model.
+Now that we have solved for the attenuation-contamination matrix, a model can be fitted and comparisons can be made between a naive model (i.e. no error adjustment) and the multivariate adjusted model.
 
 ```{r}
 model_output <- multivariate_model(
   "output ~ x + y + z",
-  data = df,
+  data = tainted_df,
   columns = c("x", "y", "z"),
   a_c_matrix = lambda$matrix,
   sds = lambda$sds,
@@ -132,18 +162,32 @@ model_output <- multivariate_model(
 )
 ```
 
-Please note that the `univariate = TRUE` argument specifies that the naive model object 
-should be returned. This allows for plotting and comparisons to be made.
+Please note that the `univariate = TRUE` argument specifies that the naive model object should be returned. This allows for plotting and comparisons to be made.
+
+### Comparing Between Unadjusted and Adjusted
+
+Recall the original model yielded coefficients that were not at all close to the "true" simulated related from earlier.
 
 ```{r}
-summary(model_output$naive)
+summary(tainted_model)
+summary(model)
+```
+
+But, with the proposed multivariate adjustment methodology can truly show how powerful it is.
+
+```{r}
 summary(model_output$multivariate)
 ```
 
-### Comparing Between Naive and Multivariate
+Looking through at the mean values of the adjusted coefficients, we can see that we now show x = 1.46, y = 3.30, and z = 3.37. Of course, these do not exactly match with the known simulated $\alpha$ parameters of 3, 4, and 5, but they are much closer to reality than what had previously been derived from the tainted dataset. Even more importantly, when we look at the 97.5% percentile, we can see that 3, 4, and 5 are contained within each one of the adjusted covariates. This means that we have recovered a lot of the ground truth from the tainted dataset.
 
-Now comparisons can be made to show how the fitted coefficients in the specified 
-model of `output ~ x + y + z` change in the presence of the error adjustment model.
+```{r}
+quantile(model_output$multivariate$x, 0.975)
+quantile(model_output$multivariate$y, 0.975)
+quantile(model_output$multivariate$z, 0.975)
+```
+
+Another nice ergonomic of the library is the ability to directly look at plots comparing the unadjusted and adjusted coefficients. Again, since we know that the reality is 3, 4, and 5, respectively for `x`, `y`, and `z`, we can much more clearly see how the adjusted coefficient distribution (blue line) is much closer and even contains the reality compared to the unadjusted coefficient distribution (red line).
 
 ```{r}
 plots <- plot_covariates(model_output, c("x", "y", "z"))
@@ -152,12 +196,13 @@ plots$y
 plots$z
 ```
 
-Though it is difficult to make direct inferences from how these coefficients change
-with the adjusted model. The end goal here is to allow for a quick adjustment
-when expensive validation studies are not possible. The National Cancer Institute
-has its own error adjustment model ([Zhang et. al 2011](#References)) that can be
-used as well. They offer their own vignettes that can be used to understand 
-other idiosyncracies of measurement error adjustment. 
+### Summary
+
+Here we have shown how the proposed methodology based off of [Muoka et al. 2020](#References) can successfully adjust for measurement error in a dataset. This has been proven via a simulated, tainted dataset that the coefficients can then be recovered to closely mirror what the true data was.
+
+### Other Resources
+
+The National Cancer Institute has its own error adjustment model ([Zhang et. al 2011](#References)) that can be used as well. They offer their own vignettes that can be used to understand other idiosyncracies of measurement error adjustment. 
 
 ### Traceplots and ACFs
 
@@ -186,7 +231,8 @@ acf_plots(model_output$naive, c("x", "y", "z"))
     Estimating national and subnational nutrient intake distributions of global diets.
     The American Journal of Clinical Nutrition, 116(2), 551–560.
     <https://doi.org/10.1093/ajcn/nqac108>
-3. Zhang, S., Midthune, D., Guenther, P. M., Krebs-Smith, S. M., Kipnis,
+3. Wikipedia contributors. (2025, September 4). Fisher transformation. Wikipedia. https://en.wikipedia.org/wiki/Fisher_transformation
+4. Zhang, S., Midthune, D., Guenther, P. M., Krebs-Smith, S. M., Kipnis,
     V., Dodd, K. W., Buckman, D. W., Tooze, J. A., Freedman, L., & Carroll, R. J. (2011).
     A NEW MULTIVARIATE MEASUREMENT ERROR MODEL WITH ZERO-INFLATED DIETARY DATA, AND
     ITS APPLICATION TO DIETARY ASSESSMENT. The Annals of Applied Statistics, 5(2B),
