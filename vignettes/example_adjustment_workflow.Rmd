@@ -17,7 +17,7 @@ knitr::opts_chunk$set(
 ```{r setup}
 suppressWarnings(library(rACMEMEEV))
 suppressWarnings(library(glmnet))
-set.seed(420)
+set.seed(987654)
 ```
 
 Let's imagine a scenario where you have recently done a survey and gathered information on three different food items that people consume via an FFQ. For ease, let's call them `x`, `y`, and `z`. Now, because measuring what people eat is quite complicated and not necessarily always accurate, there is a tacit assumption that there is measurement error. Normally, in these circumstances, researchers will conduct a validation study to understand how different the overall population deviates from the validation study. This is typically done by using a more accurate form of dietary assessment (24 hour recall or urinary recovery biomarkers). Often times this is a very costly step and not always practical. In these cases, we can turn to multivariate measurement error adjustment. The rest of this vignette will demo how to use this library and show its performance.
@@ -44,7 +44,7 @@ simulate_gamma_mix <- function(n) {
     x <- rgamma(n, shape1, rate1)
     y <- rgamma(n, shape2, rate2)
     z <- rgamma(n, shape3, rate3)
-    output <- a1 * x + a2 * y + a3 * z
+    output <- a1 * x + a2 * y + a3 * z + rnorm(n)
 
     frame <- data.frame(
       list(
