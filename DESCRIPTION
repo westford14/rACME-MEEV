@@ -30,7 +30,6 @@ Imports:
     snow,
     parallelly,
     dplyr,
-    fitdistrplus,
     BH,
     RcppEigen,
     glmnet

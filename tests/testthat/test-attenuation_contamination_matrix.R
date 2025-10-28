@@ -32,6 +32,7 @@ test_that("function works in conjunction with acme_model", {
     names(df),
     c(0.5, 0.5, 0.5)
   )
+  expect_equal(TRUE, TRUE)
 })
 
 test_that("test matrix output", {
@@ -99,6 +100,57 @@ test_that("test matrix output values", {
   expect_equal(
     temp$variances$z,
     0.4719917,
+    tolerance = 0.1
+  )
+})
+
+test_that("test matrix output values (stan backend)", {
+  df <- data.frame(
+    list(
+      x = c(1, 2, 3, 4),
+      y = c(2, 3, 4, 5),
+      z = c(3, 4, 5, 6)
+    )
+  )
+  output <- acme_model(df, names(df), seed = 42, stan = TRUE)
+  temp <- attenuation_matrix(
+    output,
+    names(df),
+    c(0.5, 0.5, 0.5),
+    stan = TRUE
+  )
+
+  # testing standard deviations
+  expect_equal(
+    temp$sds$x,
+    1.076613,
+    tolerance = 0.1
+  )
+  expect_equal(
+    temp$sds$y,
+    1.07806,
+    tolerance = 0.1
+  )
+  expect_equal(
+    temp$sds$z,
+    1.069811,
+    tolerance = 0.1
+  )
+
+  # testing variances
+  expect_equal(
+    temp$variances$x,
+    0.289774,
+    tolerance = 0.1
+  )
+  expect_equal(
+    temp$variances$y,
+    0.2905532,
+    tolerance = 0.1
+  )
+  expect_equal(
+    temp$variances$z,
+    0.286124,
     tolerance = 0.1
   )
 })

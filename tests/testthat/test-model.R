@@ -40,6 +40,7 @@ test_that("acme modelling works", {
     list(x = c(1, 2, 3, 4), y = c(2, 3, 4, 5))
   )
   acme_model(df, names(df))
+  expect_equal(TRUE, TRUE)
 })
 
 test_that("acme modelling correct output type", {

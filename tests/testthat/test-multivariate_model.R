@@ -4,6 +4,32 @@ test_that("error is thrown when not a data.frame", {
   )
 })
 
+test_that("error if univariate and no variances", {
+  expect_error(
+    multivariate_model(
+      "y ~ x",
+      data.frame,
+      c("1"),
+      matrix(c(1, 2)),
+      univariate = TRUE,
+      sds = list()
+    )
+  )
+})
+
+test_that("error if univariate and no SDs", {
+  expect_error(
+    multivariate_model(
+      "y ~ x",
+      data.frame,
+      c("1"),
+      matrix(c(1, 2)),
+      univariate = TRUE,
+      variances = list()
+    )
+  )
+})
+
 test_that("error is thrown when formula is not a character", {
   expect_error(multivariate_model(1, data.frame(), c("1"), matrix(c(1, 2))))
 })
@@ -46,6 +72,43 @@ test_that("multivariate model works", {
         c("x", "y", "z"),
         lambda$matrix,
         seed = 42
+      )
+    ),
+    TRUE
+  )
+})
+
+test_that("multivariate model works with univariate", {
+  set.seed(42)
+  x <- rnorm(100)
+  set.seed(43)
+  y <- rnorm(100)
+  set.seed(44)
+  z <- rnorm(100)
+  set.seed(45)
+  output <- rnorm(100)
+
+  df <- data.frame(
+    list(
+      x = x,
+      y = y,
+      z = z,
+      output = output
+    )
+  )
+  output <- acme_model(df, c("x", "y", "z"), seed = 42)
+  lambda <- attenuation_matrix(output, c("x", "y", "z"), c(0.5, 0.5, 0.5))
+  expect_equal(
+    is.list(
+      multivariate_model(
+        "output ~ x + y + z",
+        df,
+        c("x", "y", "z"),
+        lambda$matrix,
+        seed = 42,
+        univariate = TRUE,
+        sds = lambda[["sds"]],
+        variances = lambda[["variances"]]
       )
     ),
     TRUE

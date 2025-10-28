@@ -45,10 +45,7 @@ sensitivity_analysis <- function(
     columns,
     stan = FALSE,
     seed = 42) {
-  cores <- as.integer(parallelly::availableCores() * 0.75)
-  if (cores < 1) {
-    cores <- 1
-  }
+  cores <- as.integer(ceiling(parallelly::availableCores() * 0.75))
 
   grid <- expand.grid(parameters)
   cl <- snow::makeCluster(cores, outfile = "")
