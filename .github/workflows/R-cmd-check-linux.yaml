@@ -33,13 +33,11 @@ jobs:
         with:
           r-version: 'release'
           use-public-rspm: true
-          extra-packages: any::covr, any::xml2
-          needs: coverage
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rcmdcheck
-          needs: check
+          extra-packages: any::rcmdcheck, any::covr, any::xml2
+          needs: check, coverage
 
       - uses: r-lib/actions/check-r-package@v2
         with:
