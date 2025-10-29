@@ -59,6 +59,8 @@ test_that("test traceplots for the pre-model", {
 })
 
 test_that("test traceplots for the multivariate model (stan backend)", {
+  skip_if(Sys.getenv("CI") == "true", "only run the Stan tests locally")
+  skip_on_covr()
   set.seed(42)
   x <- rnorm(100)
   set.seed(43)
@@ -97,6 +99,8 @@ test_that("test traceplots for the multivariate model (stan backend)", {
 })
 
 test_that("test traceplots for the pre-model (stan backend)", {
+  skip_if(Sys.getenv("CI") == "true", "only run the Stan tests locally")
+  skip_on_covr()
   set.seed(42)
   x <- rnorm(100)
   set.seed(43)
