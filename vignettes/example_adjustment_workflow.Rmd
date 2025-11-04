@@ -30,10 +30,7 @@ Normally dietary consumption data is characterized by a gamma distribution ([Pas
 Before we go further, we will generate an output variable, conveniently named `output`, that is a linear combination of the three non-measurement error tainted exposures. With this, we can then fit a model that shows us how the three exposures are related to the output. This gives us the ultimate "true" relationship between the exposures and output that is being clouded by the measurement error. Which, also allows us to look back at the end and assess how close the adjusted covariates via multivariate measurement error adjustment are to the "true" relationship.
 
 ```{r}
-simulate_gamma_mix <- function(n) {
-    a1 <- 3
-    a2 <- 4
-    a3 <- 5
+simulate_gamma_mix <- function(n, a1 = 3, a2 = 4, a3 = 5) {
     shape1 <- 2
     rate1 <- 2
     shape2 <- 3
@@ -195,6 +192,51 @@ plots$x
 plots$y
 plots$z
 ```
+
+### A Quasi-Sensitivity Analysis
+
+One thing to note is that depending on the validity coefficients, we can potentially adjust out more of the measurement error. There is an interesting confluence of factors between the strength of association of an exposure and its resulting effect on the measurement error adjustment. Looking at the `z` exposure: we set the association to be 5. Let's look at what happens when we reduce the strength of association.
+
+First let's look at reducing the strength of association between the two exposure and the outcome.
+
+```{r}
+df <- simulate_gamma_mix(100, a3 = 2)
+head(df, 10)
+```
+
+From here we can follow the same procedure as above and re-use the validity coefficients to then show how this strength of association reduction changes the measurement error adjustment. Let's taint the dataset.
+
+```{r}
+tainted_df_lower_assoc <- df
+tainted_df_lower_assoc$x <- df$x + rnorm(100, mean = 2)
+tainted_df_lower_assoc$y <- df$y + rnorm(100, mean = 2)
+tainted_df_lower_assoc$z <- df$z + rnorm(100, mean = 2)
+head(tainted_df_lower_assoc, 10)
+```
+
+And now we can fit the measurement error model.
+
+```{r}
+output <- acme_model(tainted_df_lower_assoc, c("x", "y", "z"))
+lambda <- attenuation_matrix(output, c("x", "y", "z"), validity_coefficients)
+model_output <- multivariate_model(
+  "output ~ x + y + z",
+  data = tainted_df_lower_assoc,
+  columns = c("x", "y", "z"),
+  a_c_matrix = lambda$matrix,
+  sds = lambda$sds,
+  variances = lambda$variances,
+  univariate = TRUE
+)
+```
+
+And now we can see the model:
+
+```{r}
+summary(model_output$multivariate)
+```
+
+Here we can see that the coefficient is now approximately 1.5, which is much closer to the actual coefficient than it was previously when we had the greater strength of association.
 
 ### Summary
 
