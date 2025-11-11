@@ -1,0 +1,9 @@
+.vscode/
+.github/
+extra/
+outputs/
+man/
+tests/
+vignettes/
+.git/
+*.pdf

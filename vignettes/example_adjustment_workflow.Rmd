@@ -31,27 +31,27 @@ Before we go further, we will generate an output variable, conveniently named `o
 
 ```{r}
 simulate_gamma_mix <- function(n, a1 = 3, a2 = 4, a3 = 5) {
-    shape1 <- 2
-    rate1 <- 2
-    shape2 <- 3
-    rate2 <- 3
-    shape3 <- 5
-    rate3 <- 5
+  shape1 <- 2
+  rate1 <- 2
+  shape2 <- 3
+  rate2 <- 3
+  shape3 <- 5
+  rate3 <- 5
 
-    x <- rgamma(n, shape1, rate1)
-    y <- rgamma(n, shape2, rate2)
-    z <- rgamma(n, shape3, rate3)
-    output <- a1 * x + a2 * y + a3 * z + rnorm(n)
+  x <- rgamma(n, shape1, rate1)
+  y <- rgamma(n, shape2, rate2)
+  z <- rgamma(n, shape3, rate3)
+  output <- a1 * x + a2 * y + a3 * z + rnorm(n)
 
-    frame <- data.frame(
-      list(
-        output = output,
-        x = x,
-        y = y,
-        z = z
-      )
+  frame <- data.frame(
+    list(
+      output = output,
+      x = x,
+      y = y,
+      z = z
     )
-    return(frame)
+  )
+  return(frame)
 }
 ```
 
