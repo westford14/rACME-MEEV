@@ -15,7 +15,9 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-suppressWarnings(library(rACMEMEEV))
+install.packages("BH", repos = "http://cran.us.r-project.org")
+library(BH)
+library(rACMEMEEV)
 ```
 
 Here we will compare and contrast the two different sampling backends that are
