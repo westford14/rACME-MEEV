@@ -16,7 +16,7 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 suppressWarnings(library(rACMEMEEV))
-suppressWarnings(library(glmnet))
+install.packages("glmnet", repos = "http://cran.us.r-project.org")
 set.seed(987654)
 ```
 

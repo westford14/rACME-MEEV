@@ -171,6 +171,13 @@ option so that it skips the explicit local build. This is not
 recommended, but is a way to speed up the development loop if there are
 build issues arising.
 
+## Code of Conduct
+
+Please note that the rACMEMEEV project is released with a [Contributor
+Code of
+Conduct](https://contributor-covenant.org/version/2/1/CODE_OF_CONDUCT.html).
+By contributing to this project, you agree to abide by its terms.
+
 ### Maintainers
 
 - westford14

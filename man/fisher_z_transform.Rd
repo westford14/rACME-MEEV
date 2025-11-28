@@ -14,8 +14,7 @@ Transformed validity coefficient
 }
 \description{
 Take a validity coefficient and perform the
-Fisher Z Transformation (https://en.wikipedia.org/wiki/Fisher_transformation)
-to approximate a normal distribution
+Fisher Z Transformation to approximate a normal distribution
 }
 \examples{
 coef <- 0.3

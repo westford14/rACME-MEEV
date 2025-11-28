@@ -1,8 +1,7 @@
 #' Perform the Fisher Z Transformation
 #'
 #' Take a validity coefficient and perform the
-#' Fisher Z Transformation (https://en.wikipedia.org/wiki/Fisher_transformation)
-#' to approximate a normal distribution
+#' Fisher Z Transformation to approximate a normal distribution
 #'
 #' @param coefficient numeric The validity coefficient to transform.
 #' @return Transformed validity coefficient

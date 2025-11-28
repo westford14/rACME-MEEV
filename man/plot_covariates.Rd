@@ -19,3 +19,34 @@ Using the previously fit models, add the diagnostics for
 assessing the adjusted covariates based on the naive,
 univariate, and multivariate models.
 }
+\examples{
+columns <- c("fruit", "veg", "tobacco")
+fruit_v_coef <- generate_coefficient(100, 0.3, 0.8, 0.95)
+veg_v_coef <- generate_coefficient(100, 0.25, 0.75, 0.95)
+tob_v_coef <- generate_coefficient(100, 0.4, 0.7, 0.95)
+validity_coefficients <- c(fruit_v_coef, veg_v_coef, tob_v_coef)
+data <- data.frame(
+ list(
+   "BMI" = rnorm(100, mean = 0, sd = 1),
+   "fruit" = rnorm(100, mean = 0, sd = 1),
+   "veg" = rnorm(100, mean = 0, sd = 1),
+   "tobacco" = rnorm(100, mean = 0, sd = 1)
+ )
+)
+output <- acme_model(data, columns)
+lambda <- attenuation_matrix(
+  output,
+  columns,
+  validity_coefficients,
+)
+model_output <- multivariate_model(
+  "BMI ~ fruit + veg + tobacco",
+  data = data,
+  columns = columns,
+  a_c_matrix = lambda$matrix,
+  sds = lambda$sds,
+  variances = lambda$variances,
+  univariate = TRUE
+)
+plot_covariates(model_output, columns)
+}

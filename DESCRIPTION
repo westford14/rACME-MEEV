@@ -2,8 +2,8 @@ Package: rACMEMEEV
 Title: Multi-Variate Measurement Error Adjustment
 Version: 0.0.0.9000
 Authors@R: 
-    person("Alexander", "Lee", , "alex1.lee@wur.nl", role = c("aut", "cre"))
-Description: What the package does (one paragraph).
+    person("Alexander", "Lee", , "westford14@gmail.com", role = c("aut", "cre", "cph"))
+Description: A methodology to perform multivariate measurement error adjustment using external validation data. Allows users to remove the attenuating effect of measurement error by incorporating a distribution of external validation data, and allows for plotting of all resultant adjustments. Sensitivity analyses can also be run through this package to test how different ranges of validity coefficients can impact the effect of the measurement error adjustment. The methods implemented in this package are based on the work by Muoka, A., Agogo, G., Ngesa, O., Mwambi, H. (2020): <doi:10.12688/f1000research.27892.1>.
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
@@ -18,7 +18,6 @@ Imports:
     MCMCpack,
     ggplot2,
     reshape2,
-    plyr,
     rstan,
     stats,
     utils,
@@ -29,8 +28,5 @@ Imports:
     foreach,
     snow,
     parallelly,
-    dplyr,
-    BH,
-    RcppEigen,
-    glmnet
+    dplyr
 VignetteBuilder: knitr

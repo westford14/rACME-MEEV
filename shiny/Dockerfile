@@ -6,7 +6,7 @@ RUN mkdir /shiny-app
 
 COPY . /shiny-app
 
-RUN R -e "library('devtools'); setwd('/shiny-app/'); devtools::install()"
+RUN R -e "library('devtools'); setwd('/shiny-app/'); devtools::install(); install.packages(c('caret', 'glmnet'))"
 
 EXPOSE 8180
 
