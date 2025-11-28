@@ -54,3 +54,25 @@ parallel computation will be utilized here, but it is
 much more difficult to debug should errors arise. All this to
 say is: buyer beware.
 }
+\examples{
+columns <- c("fruit", "veg", "tobacco")
+data <- data.frame(
+ list(
+   "BMI" = rnorm(100, mean = 0, sd = 1),
+   "fruit" = rnorm(100, mean = 0, sd = 1),
+   "veg" = rnorm(100, mean = 0, sd = 1),
+   "tobacco" = rnorm(100, mean = 0, sd = 1)
+ )
+)
+parameters <- list(
+  fruit = c(0.3, 0.55, 0.8),
+  veg = c(0.25, 0.5, 0.75),
+  tobacco = c(0.4, 0.55, 0.7)
+)
+output_jags <- sensitivity_analysis(
+  parameters,
+  data,
+  "BMI ~ fruit + veg + tobacco",
+  columns
+)
+}

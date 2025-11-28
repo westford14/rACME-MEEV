@@ -8,3 +8,6 @@
 ^outputs/
 ^Rplots\.pdf$
 ^shiny/
+^cran-comments\.md$
+^\.dockerignore$
+^CODE_OF_CONDUCT\.md$

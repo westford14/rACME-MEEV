@@ -21,8 +21,7 @@ generate_coefficient(n, lower_bound, upper_bound, interval = 0.95, seed = 42)
 Validity coefficient
 }
 \description{
-Using the Fisher Z Transformation
-(https://en.wikipedia.org/wiki/Fisher_transformation), generate new
+Using the Fisher Z Transformation, generate new
 validity coefficients based on proposed upper and lower boundaries.
 This new validity coefficient is based on transformed upper and lower
 boundaries as well as a fitted normal distribution to the se new

@@ -24,3 +24,14 @@ Errors will be thrown if the data is not a class,
 or inherit from, a data.frame or if the specified
 columns do not exist in the data.frame.
 }
+\examples{
+data <- data.frame(
+ list(
+   "BMI" = rnorm(100, mean = 0, sd = 1),
+   "fruit" = rnorm(100, mean = 0, sd = 1),
+   "veg" = rnorm(100, mean = 0, sd = 1),
+   "tobacco" = rnorm(100, mean = 0, sd = 1)
+ )
+)
+create_modelling_data(data, c("BMI", "fruit", "veg", "tobacco"))
+}

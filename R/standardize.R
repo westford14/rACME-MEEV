@@ -10,6 +10,10 @@
 #'         and the standardized data
 #' @export
 #' @import stats
+#'
+#' @examples 
+#' data <- rnorm(100, mean = 0, sd = 1)
+#' standardize_with_return(data)
 standardize_with_return <- function(data) {
   stopifnot((is.vector(data) & !is.list(data)))
   stopifnot((is.vector(data) & length(data) > 1))

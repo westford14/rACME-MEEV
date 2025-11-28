@@ -24,3 +24,24 @@ From the output JAGS model, create the needed attenuation
 contamination matrix for further analysis. Please be aware that
 this is multivariate so a minimum of 3 columns is needed.
 }
+\examples{
+columns <- c("fruit", "veg", "tobacco")
+fruit_v_coef <- generate_coefficient(100, 0.3, 0.8, 0.95)
+veg_v_coef <- generate_coefficient(100, 0.25, 0.75, 0.95)
+tob_v_coef <- generate_coefficient(100, 0.4, 0.7, 0.95)
+validity_coefficients <- c(fruit_v_coef, veg_v_coef, tob_v_coef)
+data <- data.frame(
+ list(
+   "BMI" = rnorm(100, mean = 0, sd = 1),
+   "fruit" = rnorm(100, mean = 0, sd = 1),
+   "veg" = rnorm(100, mean = 0, sd = 1),
+   "tobacco" = rnorm(100, mean = 0, sd = 1)
+ )
+)
+output <- acme_model(data, columns)
+attenuation_matrix(
+  output,
+  columns,
+  validity_coefficients,
+)
+}

@@ -13,6 +13,16 @@
 #' @return List with all the appropriate things needed
 #'         for modelling with JAGS
 #' @export
+#' @examples 
+#' data <- data.frame(
+#'  list(
+#'    "BMI" = rnorm(100, mean = 0, sd = 1),
+#'    "fruit" = rnorm(100, mean = 0, sd = 1),
+#'    "veg" = rnorm(100, mean = 0, sd = 1),
+#'    "tobacco" = rnorm(100, mean = 0, sd = 1)
+#'  )
+#' )
+#' create_modelling_data(data, c("BMI", "fruit", "veg", "tobacco"))
 create_modelling_data <- function(data, columns) {
   stopifnot(is.data.frame(data))
   stopifnot(all(columns %in% names(data)))
