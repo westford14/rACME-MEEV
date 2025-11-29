@@ -39,18 +39,28 @@ navbarPage(
       verbatimTextOutput("naive_summary"),
       hr(),
       helpText(
-        "
-        Above shows a 'naive' model where measurement error is not
-        taken into consideration. And it is clear to see how
-        'measurement error' can significantly impact our view of
-        the world. The estimated coefficients on `x2`, `x2`, and `x3`
-        are vastly different and do not at all reflect
-        the set values by the left panel. Thus, we can see how and
-        why this measurement error adjustment is so important. Continue
-        on to the next tab to see how we the proposed measurment error
-        adjustment methodology performs on this very same data.
-        "
-      )
+        paste(
+          "
+          Above shows a 'naive' model where measurement error is not
+          taken into consideration. And it is clear to see how
+          'measurement error' can significantly impact our view of
+          the world. The estimated coefficients on `x2`, `x2`, and `x3`
+          are vastly different and do not at all reflect
+          the set values by the left panel. Thus, we can see how and
+          why this measurement error adjustment is so important. Continue
+          on to the next tab to see how we the proposed measurment error
+          adjustment methodology performs on this very same data.
+          ",
+          "
+          Below shows the true model where we can see that the resultant
+          coefficients yielded are, in essence, what has been specifically set
+          by us.
+          ",
+          sep = "\n"
+        )
+      ),
+      hr(),
+      verbatimTextOutput("true_summary")
     )
   ),
   tabPanel("rACME-MEEV",

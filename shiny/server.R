@@ -145,6 +145,11 @@ function(input, output, session) {
     print(summary(tainted_model))
   })
 
+  output$true_summary <- renderPrint({
+    true_model <- glm("output ~ x1 + x2 + x3", data = selected_data())
+    print(summary(true_model))
+  })
+
   data <- reactive({
     file1 <- input$file
     if (is.null(file1)) {
