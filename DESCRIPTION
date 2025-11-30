@@ -32,3 +32,5 @@ Imports:
     parallelly,
     dplyr
 VignetteBuilder: knitr
+URL: https://github.com/westford14/rACME-MEEV
+BugReports: https://github.com/westford14/rACME-MEEV/issues
