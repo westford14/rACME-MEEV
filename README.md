@@ -131,7 +131,7 @@ git checkout -b your/descriptive/branch/name
 
 Once development is complete, please open a pull request making sure to
 note the fields provided in the [pull request
-template](./github/pull_request_template.md).
+template](./.github/pull_request_template.md).
 
 There are a couple of key commands that you should keep in mind when
 developing this library. First, make sure that `devtools` and `knitr`
