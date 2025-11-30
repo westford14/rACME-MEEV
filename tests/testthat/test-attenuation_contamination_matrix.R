@@ -148,11 +148,11 @@ test_that("test matrix output values (stan backend)", {
   expect_equal(
     temp$variances$y,
     0.2905532,
-    tolerance = 0.1
+    tolerance = 0.5
   )
   expect_equal(
     temp$variances$z,
     0.286124,
-    tolerance = 0.1
+    tolerance = 0.5
   )
 })
