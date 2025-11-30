@@ -82,14 +82,16 @@ attenuation_matrix <- function(
     } else {
       rho <- cov_matrix[col_name, "Mean"]
     }
-    correlations[[columns[column]]] <- rho
+    correlations[[column]] <- rho 
 
     name <- paste0("cov-", columns[first], "-", columns[second])
     covar <- sds[[columns[first]]] * sds[[columns[second]]] * rho
     covariances[[name]] <- covar
-    variances[[columns[column]]] <- (
-      (validity_coefficients[column])^2 * (sds[[column]])^2
-    )
+    if (column <= length(columns)) {
+      variances[[columns[column]]] <- (
+        (validity_coefficients[column])^2 * (sds[[column]])^2
+      )
+    }
   }
 
   covariances_between <- list()
