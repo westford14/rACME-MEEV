@@ -1,4 +1,6 @@
 test_that("test sensitivity analysis", {
+  skip_if(Sys.getenv("CI") == "true", "only run the sensitivity tests locally")
+  skip_on_covr()
   set.seed(42)
   x <- rnorm(100)
   set.seed(43)
@@ -64,7 +66,7 @@ test_that("test sensitivity analysis", {
 })
 
 test_that("test sensitivity analysis (stan backend)", {
-  skip_if(Sys.getenv("CI") == "true", "only run the Stan tests locally")
+  skip_if(Sys.getenv("CI") == "true", "only run the sensitivity tests locally")
   skip_on_covr()
   set.seed(42)
   x <- rnorm(100)
