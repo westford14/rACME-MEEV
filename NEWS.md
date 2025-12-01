@@ -1,4 +1,4 @@
-# rACMEMEEV (development version)
+# rACMEMEEV 1.0.0
 
 * Initial CRAN submission.
 
