@@ -1,6 +1,6 @@
 Package: rACMEMEEV
 Title: Multi-Variate Measurement Error Adjustment
-Version: 1.0.0
+Version: 1.0.1
 Authors@R: 
     person("Alexander", "Lee", , "westford14@gmail.com", role = c("aut", "cre", "cph"))
 Description: A methodology to perform multivariate measurement error adjustment using external validation data. Allows users to remove the attenuating effect of measurement error by incorporating a distribution of external validation data, and allows for plotting of all resultant adjustments. Sensitivity analyses can also be run through this package to test how different ranges of validity coefficients can impact the effect of the measurement error adjustment. The methods implemented in this package are based on the work by Muoka, A., Agogo, G., Ngesa, O., Mwambi, H. (2020): <doi:10.12688/f1000research.27892.1>.
