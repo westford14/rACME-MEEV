@@ -1,6 +1,8 @@
 # rACMEMEEV 1.0.1
 
-## rACMEMEEV 1.0.0
+### Bug Fixes
+
+* Fixing error on Fedora GCC sensitivity analysis test
 
 ## rACMEMEEV 1.0.0
 

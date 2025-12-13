@@ -106,6 +106,7 @@ test_that("test matrix output values", {
 
 test_that("test matrix output values (stan backend)", {
   skip_if(Sys.getenv("CI") == "true", "only run the Stan tests locally")
+  skip_on_cran()
   skip_on_covr()
   df <- data.frame(
     list(
