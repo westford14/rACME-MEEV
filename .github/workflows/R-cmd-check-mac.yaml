@@ -44,7 +44,7 @@ jobs:
       
       - name: install rACME-MEEV and test
         run: |
-          Rscript -e "install.packages('devtools', repos = c(CRAN = 'https://cran.r-project.org')); library('devtools'); devtools::install(); devtools::check(error_on = 'error'); devtools::test();"
+          Rscript -e "install.packages('devtools', repos = c(CRAN = 'https://cran.r-project.org')); library('devtools'); devtools::install(dependencies = TRUE); devtools::check(error_on = 'error'); devtools::test();"
         shell: bash
 
       

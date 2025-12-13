@@ -55,19 +55,20 @@ much more difficult to debug should errors arise. All this to
 say is: buyer beware.
 }
 \examples{
+\dontshow{if (identical(tolower(Sys.getenv("NOT_CRAN")), "true")) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 columns <- c("fruit", "veg", "tobacco")
 data <- data.frame(
  list(
-   "BMI" = rnorm(100, mean = 0, sd = 1),
-   "fruit" = rnorm(100, mean = 0, sd = 1),
-   "veg" = rnorm(100, mean = 0, sd = 1),
-   "tobacco" = rnorm(100, mean = 0, sd = 1)
+   "BMI" = rnorm(5, mean = 0, sd = 1),
+   "fruit" = rnorm(5, mean = 0, sd = 1),
+   "veg" = rnorm(5, mean = 0, sd = 1),
+   "tobacco" = rnorm(5, mean = 0, sd = 1)
  )
 )
 parameters <- list(
-  fruit = c(0.3, 0.55, 0.8),
-  veg = c(0.25, 0.5, 0.75),
-  tobacco = c(0.4, 0.55, 0.7)
+  fruit = c(0.3),
+  veg = c(0.25),
+  tobacco = c(0.4)
 )
 output_jags <- sensitivity_analysis(
   parameters,
@@ -75,4 +76,5 @@ output_jags <- sensitivity_analysis(
   "BMI ~ fruit + veg + tobacco",
   columns
 )
+\dontshow{\}) # examplesIf}
 }

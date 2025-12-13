@@ -39,20 +39,20 @@
 #' @importFrom dplyr bind_rows
 #' @importFrom foreach %dopar%
 #'
-#' @examples
+#' @examplesIf identical(tolower(Sys.getenv("NOT_CRAN")), "true")
 #' columns <- c("fruit", "veg", "tobacco")
 #' data <- data.frame(
 #'  list(
-#'    "BMI" = rnorm(100, mean = 0, sd = 1),
-#'    "fruit" = rnorm(100, mean = 0, sd = 1),
-#'    "veg" = rnorm(100, mean = 0, sd = 1),
-#'    "tobacco" = rnorm(100, mean = 0, sd = 1)
+#'    "BMI" = rnorm(5, mean = 0, sd = 1),
+#'    "fruit" = rnorm(5, mean = 0, sd = 1),
+#'    "veg" = rnorm(5, mean = 0, sd = 1),
+#'    "tobacco" = rnorm(5, mean = 0, sd = 1)
 #'  )
 #' )
 #' parameters <- list(
-#'   fruit = c(0.3, 0.55, 0.8),
-#'   veg = c(0.25, 0.5, 0.75),
-#'   tobacco = c(0.4, 0.55, 0.7)
+#'   fruit = c(0.3),
+#'   veg = c(0.25),
+#'   tobacco = c(0.4)
 #' )
 #' output_jags <- sensitivity_analysis(
 #'   parameters,

@@ -6,6 +6,7 @@
 .DS_Store
 .quarto
 Rplots.pdf
+CRAN-SUBMISSION
 
 # Project specific
 base_r_script.R
