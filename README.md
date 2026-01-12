@@ -22,7 +22,7 @@ You can install the development version of rACME-MEEV from
 
 ``` r
 # install.packages("pak")
-pak::pak("westford14/rACMEMEEV")
+pak::pak("westford14/rACME-MEEV")
 ```
 
 ## Example

@@ -30,7 +30,7 @@ You can install the development version of rACME-MEEV from [GitHub](https://gith
 
 ``` r
 # install.packages("pak")
-pak::pak("westford14/rACMEMEEV")
+pak::pak("westford14/rACME-MEEV")
 ```
 
 ## Example
